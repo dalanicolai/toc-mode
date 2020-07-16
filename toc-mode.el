@@ -51,6 +51,8 @@
 (defun toc-cleanup-lines-roman-string (&optional arg)
   (interactive)
   (beginning-of-buffer)
+  ;; (re-search-forward "^ *[ivx0-9\\.]+ *$" nil t)
+  ;; (replace-match "")
   (while (not (eobp))
     (re-search-forward "^ *[ivx0-9\\.]* *$")
     (replace-match "")
@@ -75,9 +77,9 @@
     (replace-match (format "Contents %s" startpage)))
   (toc-cleanup-lines-contents-string)
   (toc-cleanup-dots)
-  (toc-cleanup-lines-roman-string)
+  ;; (toc-cleanup-lines-roman-string)
   (toc-cleanup-blank-lines)
-  (toc-join-unnumbered-lines)
+  (toc-join-next-unnumbered-lines)
   )
 
 (defun get-index-levels (seperator)
@@ -125,9 +127,10 @@
                         (shell-quote-argument buffer-file-name))))
          (buffer (get-buffer-create (file-name-sans-extension (buffer-name)))))
     (switch-to-buffer buffer)
+    (toc-cleanup-mode) ;; required before setting local variable
     (setq-local doc-buffer source-buffer)
     (insert text)
-    (kill-whole-line)
+    ;; (kill-whole-line)
     ))
 
 
@@ -136,7 +139,6 @@
 Use with the universal argument (C-u) omits cleanup to get the unprocessed text."
   (interactive "nEnter start-pagenumber for extraction: \nnEnter end-pagenumber for extraction: \nP")
   (document-extract-pages-text startpage endpage)
-  (toc-cleanup-mode)
   (unless arg
     (toc-cleanup startpage)))
 
@@ -157,11 +159,15 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
     (setq-local doc-buffer source-buffer)
     (insert text)))
 
+(defun toc-create-tablist-buffer ()
+  (interactive)
+  (toc-list doc-buffer))
+
 ;;;; toc major modes
 
 (defvar toc-cleanup-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-c" 'toc-list)
+    (define-key map "\C-c\C-c" 'toc-create-tablist-buffer)
     (define-key map "\C-c\C-j" 'toc-join-next-unnumbered-lines)
     map))
 
@@ -249,7 +255,7 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
 (defun toc-tablist-follow ()
   (interactive)
   (let ((page (string-to-number (aref (tabulated-list-get-entry) 2))))
-    (pop-to-buffer pdf-buffer)
+    (pop-to-buffer doc-buffer)
     (pdf-view-goto-page page)
     (other-window 1)))
 
@@ -297,11 +303,13 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
   (setq-local tabulated-list-format [("level" 10 nil) ("name" 80 nil) ("page" 1 nil)])
   (tabulated-list-init-header))
 
-(defun toc-list ()
+(defun toc-list (buffer)
   (interactive)
-  (let ((toc-tablist (toc-convert-to-tabulated-list)))
+  (let ((source-buffer buffer)
+        (toc-tablist (toc-convert-to-tabulated-list)))
     (switch-to-buffer (concat (buffer-name) ".list"))
     (toc-tabular-mode)
+    (setq-local doc-buffer source-buffer)
     (setq-local tabulated-list-entries toc-tablist)
     (tabulated-list-print)))
 
