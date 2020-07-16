@@ -38,7 +38,8 @@ subsequent prompts by entering the pagenumbers for the first and the last page
 each followed by =RET=.
 
 A buffer with the, somewhat cleaned up, extracted text will open in TOC-cleanup
-mode.
+mode. Prefix command with the universal argument (=C-u=) to omit clean and get the
+raw text.
 
 ** 2. TOC-Cleanup
 In this mode you can further cleanup the contents to create a list where
