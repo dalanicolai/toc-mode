@@ -14,8 +14,8 @@ OCR.
 For djvu documents, only outlines with maximum level deepness of 1 are correctly
 parsed. For outlines with level deepness of 2 not all levels are set to correct
 level because the algorithm in the =toc-parse-djvused= function does not parse
-such file correctly yet (you are welcome to 'repair' the algorithm to produce
-the correct syntax as described [[http://djvu.sourceforge.net/doc/man/djvused.html#lbAW][on the djvused website here]]).
+such files correctly yet (you are welcome to 'repair' the algorithm to produce
+the correct syntax as it is described [[http://djvu.sourceforge.net/doc/man/djvused.html#lbAW][on the djvused website here]]).
 
 
 
@@ -25,7 +25,7 @@ Currently the package requires the ~pdftotext~ (part of poppler-utils), ~pdfoutl
 line utilities to be available.
 
 * Usage
-Extraction and adding contents to the document is done in 4 steps:
+Extraction and adding contents to a document is done in 4 steps:
 1. extraction
 2. cleanup
 3. adjust/correct pagenumbers
@@ -72,7 +72,7 @@ contain a structure like
 Section 1      2  
 #+END_SRC
 Here the indentation can be set with ~M-x replace-regexp~ ~^[^0-9]~ ->  ~\&~ (where
-there is a space character before the ~\&~ represents a space).
+there is a space character before the ~\&~).
 
 Type =C-c C-c= when finished
 
