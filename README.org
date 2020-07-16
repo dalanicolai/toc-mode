@@ -72,7 +72,7 @@ contain a structure like
 1 Chapter 1    1
 Section 1      2  
 #+END_SRC
-Here the indentation can be set with ~M-x replace-regexp~ ~^[^0-9]~ ->  ~\&~ (where
+Here the indentation can be set with =M-x replace-regexp= ~^[^0-9]~ ->  ~\&~ (where
 there is a space character before the ~\&~).
 
 Type =C-c C-c= when finished
@@ -96,5 +96,8 @@ to (for pdf's a copy of) the original document. Final adjusments can be done but
 should not be necessary. For pdf just type =C-c C-c= for adding the contents to the
 document. For djvu type =M-x toc-add-to-djvu=.
 
-For pdf the a file =pdfwithtoc.pdf= is created in the same folder as the original
-pdf. For djvu, the TOC is simply added to the original djvu file.
+By default, the TOC is simply added to the original file. ONLY FOR PDF's, if the
+(customizable) variable ~toc-replace-original-file~ is ~nil~, then the TOC is added
+to a copy of the original pdf file with path as defined by the variable
+~toc-destination-file-name~, where either a relative path to the original file
+directory or an absolute path can be given.

@@ -24,10 +24,19 @@
 
 ;;; Code:
 
+(defgroup toc-mode nil
+  "Setting for the toc-mode package")
 
+(defcustom toc-replace-original-file t
+  "For PDF include TOC and replace old PDF file.
+For DJVU the old DJVU file is replaced by default"
+  :type 'boolean
+  :group 'toc-mode)
 
-(provide 'document-outliner)
-;;; document-outliner.el ends here
+(defcustom toc-destination-file-name "pdfwithtoc.pdf"
+  "Filename for new PDF if toc-replace-original-file is nil"
+  :type 'file
+  :group 'toc-mode)
 
 ;;;; toc-extract and cleanup
 
@@ -385,7 +394,9 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
   (call-process "pdfoutline" nil "*pdfoutline*" nil
                 (concat (file-name-sans-extension (buffer-name)) ".pdf")
                 (buffer-name)
-                "pdfwithtoc.pdf"))
+                (if toc-replace-original-file
+                    (concat (file-name-sans-extension (buffer-name)) ".pdf")
+                  toc-destination-file-name)))
 
 (defun toc-add-to-djvu ()
   "combine with add-toc-to-djvu in add-toc-to-document when ready"
@@ -447,5 +458,6 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
     ;; (print (mapcar #'(lambda (region) (pdf-info-gettext page region)) (pdf-info-line-regions regions)))))
     ;; (mapcar '(lambda (region) (pdf-info-gettext page region)) regions)))
 
-
+(provide 'toc-mode)
+;;; document-outliner.el ends here
 
