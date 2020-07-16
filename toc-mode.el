@@ -391,16 +391,13 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
   "combine with add-toc-to-djvu in add-toc-to-document when ready"
   (interactive)
   (save-buffer)
-  (shell-command (shell-quote-argument
+  (shell-command (shell-command-to-string
                   (format
-                  "djvused -s -e 'set-outline \"%s\"' %s"
-                  (buffer-name)
-                  (concat (file-name-sans-extension (buffer-name)) ".djvu")))))
-  ;; (call-process "djvused" nil "*djvused*" nil
-  ;;               "-s"
-  ;;               "-e" 
-  ;;               (format "'set-outline \"%s\"'" (buffer-file-name))
-  ;;                (concat (file-name-sans-extension (buffer-name)) ".djvu")))
+                   "djvused -s -e \"set-outline '%s'\" %s"
+                   (buffer-name)
+                   (shell-quote-argument
+                    (concat (file-name-sans-extension (buffer-name)) ".djvu"))))))
+
 
 ;;;; PDF-Tools functions (PDF-tools does not yet produce best layout, e.g. try pdf-extract-page-lines)
 

@@ -11,6 +11,11 @@ TOC via OCR will probably be added soon. Until then, the python
 [[https://pypi.org/project/document-contents-extractor/][documents-contents-extractor]] package is recommended for extraction of TOC via
 OCR.
 
+For djvu documents, only outlines with maximum level deepness of 1 are correctly
+parsed. For outlines with level deepness of 2 not all levels are set to correct
+level because the algorithm in the =toc-parse-djvused= function does not parse
+such file correctly yet (you are welcome to 'repair' the algorithm).
+
 * Requirements
 Currently the package requires the ~pdftotext~ (part of poppler-utils), ~pdfoutline~
 (part of [[https://launchpad.net/ubuntu/bionic/+package/fntsample][fntsample]]) and ~djvused~ (part of [[http://djvu.sourceforge.net/][http://djvu.sourceforge.net/]]) command
@@ -79,13 +84,13 @@ The =TAB= key jumps to the pagenumber of the current line. =S-up/S-donw= in the
 tablist window will scroll page up/down in the document window while =C-up/C-down=
 will scroll smoothly in that window.
 
-Type =C-c C-c= when done
+For pdf type =C-c C-c= when done. For djvu type =M-x toc-tablist-to-djvused=.
 
 ** TOC-mode (add outline to document)
 The text of this buffer should have the right structure for adding the contents
 to (for pdf's a copy of) the original document. Final adjusments can be done but
-should not be necessary. Just type =C-c C-c= for adding the contents to the
-document.
+should not be necessary. For pdf just type =C-c C-c= for adding the contents to the
+document. For djvu type =M-x toc-add-to-djvu=.
 
 For pdf the a file =pdfwithtoc.pdf= is created in the same folder as the original
 pdf. For djvu, the TOC is simply added to the original djvu file.
