@@ -50,6 +50,13 @@ For DJVU the old DJVU file is replaced by default"
     (forward-line 1))
     )
 
+(defun toc-cleanup-dots-ocr ()
+  (interactive)
+  (beginning-of-buffer)
+  (while (re-search-forward "\\([0-9\\. \\-]*\\)\\( [0-9]* *\\)$" nil t)
+    (replace-match " \\2"))
+  )
+
 (defun toc-cleanup-lines-contents-string (&optional arg)
   (interactive "nEnter line number of entry 'Contents': ")
   (when (called-interactively-p 'any)
@@ -79,13 +86,19 @@ For DJVU the old DJVU file is replaced by default"
   (re-search-forward "[^0-9]\\s-*$" nil t)
    (join-line 1))
 
-(defun toc-cleanup (startpage)
+(defun toc-join-next-overindexed-index ()
+  (interactive)
+  (re-search-forward "^[0-9\\.]*\\. " nil t))
+
+(defun toc-cleanup (startpage &optional arg)
   (interactive)
   (beginning-of-buffer)
   (when (search-forward "contents" nil t)
     (replace-match (format "Contents %s" startpage)))
   (toc-cleanup-lines-contents-string)
-  (toc-cleanup-dots)
+  (if arg
+      (toc-cleanup-dots-ocr)
+    (toc-cleanup-dots))
   ;; (toc-cleanup-lines-roman-string)
   (toc-cleanup-blank-lines)
   (toc-join-next-unnumbered-lines)
@@ -123,7 +136,6 @@ For DJVU the old DJVU file is replaced by default"
 
 ;;; toc extract
 (defun document-extract-pages-text (startpage endpage)
-  (interactive "nEnter start-pagenumber for extraction: \nnEnter end-pagenumber for extraction: ")
   (let* ((source-buffer (current-buffer))
          (ext (url-file-extension (buffer-file-name (current-buffer))))
          (shell-command (cond ((string= ".pdf" ext) "pdftotext -f %s -l %s -layout %s -")
@@ -142,14 +154,30 @@ For DJVU the old DJVU file is replaced by default"
     ;; (kill-whole-line)
     ))
 
-
-(defun toc-extract-pages (startpage endpage &optional arg)
+(defun toc-extract-pages (startpage endpage arg)
   "Extract text and cleanup text from table of contents.
 Use with the universal argument (C-u) omits cleanup to get the unprocessed text."
   (interactive "nEnter start-pagenumber for extraction: \nnEnter end-pagenumber for extraction: \nP")
   (document-extract-pages-text startpage endpage)
   (unless arg
     (toc-cleanup startpage)))
+
+(defun toc-extract-pages-ocr (startpage endpage arg)
+  (interactive "nEnter start-pagenumber for extraction: \nnEnter end-pagenumber for extraction: \nP")
+    (let* ((source-buffer (current-buffer))
+           (ext (url-file-extension (buffer-file-name (current-buffer))))
+           (text "")
+           (buffer (file-name-sans-extension (buffer-name))))
+      (while (<= startpage (+ endpage))
+        (let ((file (cond ((string= ".pdf" ext) (make-temp-file "pageimage" nil (number-to-string startpage) (pdf-cache-get-image startpage 600)))
+                          ((string= ".djvu" ext) (djvu-goto-page startpage) (make-temp-file "pageimage" nil (number-to-string startpage) (image-property djvu-doc-image :data))))))
+               (call-process "tesseract" nil (list buffer nil) nil file "stdout" "--psm" "6")
+               (setq startpage (1+ startpage))))
+      (switch-to-buffer buffer)
+      (toc-cleanup-mode) ;; required before setting local variable
+      (setq-local doc-buffer source-buffer)
+      (unless arg
+        (toc-cleanup startpage t))))
 
 (defun toc-extract-outline ()
   (interactive)
@@ -457,6 +485,7 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
     (print (pdf-info-gettext page (nth 1 (pdf-info-line-textregions regions)) 'line))))
     ;; (print (mapcar #'(lambda (region) (pdf-info-gettext page region)) (pdf-info-line-regions regions)))))
     ;; (mapcar '(lambda (region) (pdf-info-gettext page region)) regions)))
+
 
 (provide 'toc-mode)
 ;;; document-outliner.el ends here
