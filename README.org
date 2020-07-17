@@ -79,7 +79,7 @@ there is a space character before the ~\&~).
 
 Type =C-c C-c= when finished
 
-** 3 TOC-tabular (adjust pagenumbers)
+** 3. TOC-tabular (adjust pagenumbers)
 This mode provides the functionality for easy adjustment of pagenmumbers. The
 buffer can be navigated with the arrow =up/down= keys. The =left= and =right= arrow
 keys will shift =down/up= all the page numbers from the current line and below
@@ -92,7 +92,7 @@ will scroll smoothly in that window.
 
 For pdf type =C-c C-c= when done. For djvu type =M-x toc-tablist-to-djvused=.
 
-** TOC-mode (add outline to document)
+** 4. TOC-mode (add outline to document)
 The text of this buffer should have the right structure for adding the contents
 to (for pdf's a copy of) the original document. Final adjusments can be done but
 should not be necessary. For pdf just type =C-c C-c= for adding the contents to the
