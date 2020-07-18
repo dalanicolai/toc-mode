@@ -87,9 +87,8 @@ buffer can be navigated with the arrow =up/down= keys. The =left= and =right= ar
 keys will shift =down/up= all the page numbers from the current line and below
 (combine with =SHIFT= for setting individual pagenumbers). 
 
-**** Currently only for pdf's
 The =TAB= key jumps to the pagenumber of the current line. =S-up/S-donw= in the
-tablist window will scroll page up/down in the document window while =C-up/C-down=
+tablist window will scroll page up/down in the document window while, only for pdf, =C-up/C-down=
 will scroll smoothly in that window.
 
 For type =C-c C-c= when done.
