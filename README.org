@@ -87,11 +87,13 @@ buffer can be navigated with the arrow =up/down= keys. The =left= and =right= ar
 keys will shift =down/up= all the page numbers from the current line and below
 (combine with =SHIFT= for setting individual pagenumbers). 
 
-The =TAB= key jumps to the pagenumber of the current line. =S-up/S-donw= in the
-tablist window will scroll page up/down in the document window while, only for pdf, =C-up/C-down=
+The =TAB= key jumps to the pagenumber of the current line, while =C-right/C-left=
+will shift all remaining page numbers up/down while jumping/scrolling to the
+line its page in the document window. to the =S-up/S-donw= in the tablist window
+will just scroll page up/down in the document window and, only for pdf, =C-up/C-down=
 will scroll smoothly in that window.
 
-For type =C-c C-c= when done.
+Type =C-c C-c= when done.
 
 ** 4. TOC-mode (add outline to document)
 The text of this buffer should have the right structure for adding the contents

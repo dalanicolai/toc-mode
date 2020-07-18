@@ -307,6 +307,16 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
           ((string= ".djvu" ext) (djvu-goto-page page)))
     (other-window 1)))
 
+(defun toc-increase-remaining-and-follow ()
+  (interactive)
+  (toc-increase-remaining)
+  (toc-tablist-follow))
+
+(defun toc-decrease-remaining-and-follow ()
+  (interactive)
+  (toc-decrease-remaining)
+  (toc-tablist-follow))
+
 (defun toc-scroll-other-window-page-up ()
   (interactive)
   (other-window 1)
@@ -341,6 +351,8 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
     (define-key map [left] 'toc-decrease-remaining)
     (define-key map [S-right] 'toc-increase)
     (define-key map [S-left] 'toc-decrease)
+    (define-key map [C-right] 'toc-increase-remaining-and-follow)
+    (define-key map [C-left] 'toc-decrease-remaining-and-follow)
     (define-key map [tab] 'toc-tablist-follow)
     (define-key map [S-down] 'toc-scroll-other-window-page-up)
     (define-key map [S-up] 'toc-scroll-other-window-page-down)
