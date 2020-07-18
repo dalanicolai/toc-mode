@@ -1,4 +1,4 @@
-;;; document-outliner.el --- Manage outlines of pdf and djvu document  -*- lexical-binding: t; -*-
+;; document-outliner.el --- Manage outlines of pdf and djvu document  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Daniel Laurens Nicolai
 
@@ -331,7 +331,7 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
     (define-key map [S-up] 'toc-scroll-pdf-other-window-page-down)
     (define-key map [C-down] 'toc-scroll-pdf-other-window-up)
     (define-key map [C-up] 'toc-scroll-pdf-other-window-down)
-    (define-key map "\C-c\C-c" 'toc-tablist-to-pdfoutline)
+    (define-key map "\C-c\C-c" 'toc-tablist-to-toc-source)
     map))
 
 (define-derived-mode toc-tabular-mode
@@ -354,7 +354,7 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
 
 (defvar toc-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-c" 'toc-add-to-pdf)
+    (define-key map "\C-c\C-c" 'toc-add-to-doc)
     map))
 
 (define-derived-mode toc-mode
@@ -367,7 +367,8 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
 (defun toc-tablist-to-pdfoutline ()
   (interactive)
   (beginning-of-buffer)
-  (let (text)
+  (let ((source-buffer doc-buffer)
+        text)
     (while (not (eobp))
       (let ((v (tabulated-list-get-entry)))
         (setq text (concat text (format "%s %s %s\n" (aref v 0) (aref v 2) (aref v 1) )))
@@ -375,6 +376,7 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
     (switch-to-buffer (find-file (concat (file-name-sans-extension (buffer-name)) ".txt")))
     (erase-buffer)
     (toc-mode)
+    (setq-local doc-buffer source-buffer)
     (insert text)))
 
 ;;;; djvu parse tablist to outline
@@ -403,15 +405,20 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
          (outline (append bookmarks (toc-parse-djvused 0))))
     (while (not (eobp))
       (setq outline (append outline (toc-parse-djvused 0))))
-    (let ((text (format "%S" outline)))
+    (let ((source-buffer doc-buffer)
+          (text (format "%S" outline)))
       (switch-to-buffer (find-file (concat (file-name-sans-extension (buffer-name)) ".txt")))
       (erase-buffer)
+      (toc-mode)
+      (setq-local doc-buffer source-buffer)
       (insert text))))
 
-;; (defun toc-tablist-to-toc-source ()
-;;   (cond ((string= ".pdf" ext) "pdftotext -f %s -l %s -layout %s -")
-;;         ((string= ".djvu" ext) "djvutxt --page=%s-%s %s")
-;;         (t (error "Buffer-filename does not have pdf or djvu extension"))))
+(defun toc-tablist-to-toc-source ()
+  (interactive)
+  (let ((ext (url-file-extension (buffer-file-name doc-buffer))))
+    (cond ((string= ".pdf" ext) (toc-tablist-to-pdfoutline))
+          ((string= ".djvu" ext) (print "this is DJVU") (toc-tablist-to-djvused))
+          (t (error "Buffer-source-file does not have pdf or djvu extension")))))
 
 
 ;;;; add outline to document
@@ -438,6 +445,11 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
                     (concat (file-name-sans-extension (buffer-name)) ".djvu"))))))
 
 
+(defun toc-add-to-doc ()
+  (interactive)
+  (let ((ext (url-file-extension (buffer-file-name doc-buffer))))
+    (cond ((string= ".pdf" ext) (toc-add-to-pdf))
+          ((string= ".djvu" ext) (toc-add-to-djvu)))))
 ;;;; PDF-Tools functions (PDF-tools does not yet produce best layout, e.g. try pdf-extract-page-lines)
 
 (defun pdf-extract-page-text (&optional arg)

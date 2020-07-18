@@ -92,16 +92,16 @@ The =TAB= key jumps to the pagenumber of the current line. =S-up/S-donw= in the
 tablist window will scroll page up/down in the document window while =C-up/C-down=
 will scroll smoothly in that window.
 
-For pdf type =C-c C-c= when done. For djvu type =M-x toc-tablist-to-djvused=.
+For type =C-c C-c= when done.
 
 ** 4. TOC-mode (add outline to document)
 The text of this buffer should have the right structure for adding the contents
 to (for pdf's a copy of) the original document. Final adjusments can be done but
-should not be necessary. For pdf just type =C-c C-c= for adding the contents to the
-document. For djvu type =M-x toc-add-to-djvu=.
+should not be necessary. Type =C-c C-c= for adding the contents to the
+document. 
 
 By default, the TOC is simply added to the original file. ONLY FOR PDF's, if the
 (customizable) variable ~toc-replace-original-file~ is ~nil~, then the TOC is added
-to a copy of the original pdf file with path as defined by the variable
-~toc-destination-file-name~, where either a relative path to the original file
+to a copy of the original pdf file with the path as defined by the variable
+~toc-destination-file-name~. Either a relative path to the original file
 directory or an absolute path can be given.
