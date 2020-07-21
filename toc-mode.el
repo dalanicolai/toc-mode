@@ -1,4 +1,4 @@
-;; document-outliner.el --- Manage outlines of pdf and djvu document  -*- lexical-binding: t; -*-
+;;; toc-mode.el --- Manage outlines of pdf and djvu document  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Daniel Laurens Nicolai
 
@@ -154,6 +154,7 @@ For DJVU the old DJVU file is replaced by default"
     ;; (kill-whole-line)
     ))
 
+;;;###autoload
 (defun toc-extract-pages (startpage endpage arg)
   "Extract text and cleanup text from table of contents.
 Use with the universal argument (C-u) omits cleanup to get the unprocessed text."
@@ -162,6 +163,7 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
   (unless arg
     (toc-cleanup startpage)))
 
+;;;###autoload
 (defun toc-extract-pages-ocr (startpage endpage arg)
   (interactive "nEnter start-pagenumber for extraction: \nnEnter end-pagenumber for extraction: \nP")
     (let* ((source-buffer (current-buffer))
@@ -356,8 +358,8 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
     (define-key map [tab] 'toc-tablist-follow)
     (define-key map [S-down] 'toc-scroll-other-window-page-up)
     (define-key map [S-up] 'toc-scroll-other-window-page-down)
-    (define-key map [C-down] 'toc-scroll-pdf-other-window-up)
-    (define-key map [C-up] 'toc-scroll-pdf-other-window-down)
+    (define-key map [C-down] 'toc-scroll-pdf-other-window-down)
+    (define-key map [C-up] 'toc-scroll-pdf-other-window-up)
     (define-key map "\C-c\C-c" 'toc-tablist-to-toc-source)
     map))
 
