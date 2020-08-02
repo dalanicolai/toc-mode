@@ -190,6 +190,7 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
       (unless arg
         (toc-cleanup startpage t))))
 
+;;;###autoload
 (defun toc-extract-outline ()
   (interactive)
   (let* ((source-buffer (current-buffer))
@@ -281,6 +282,7 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
    t))
 
 (defun toc-increase-remaining ()
+  "Increase pagenumber of current entry and all entries below"
   (interactive)
   (save-excursion
     (while (not (eobp))
@@ -291,6 +293,7 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
       (forward-line 1))))
 
 (defun toc-decrease-remaining ()
+  "Decrease pagenumber of current entry and all entries below"
   (interactive)
   (save-excursion
     (while (not (eobp))
