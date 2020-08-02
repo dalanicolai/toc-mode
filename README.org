@@ -5,18 +5,21 @@ Create, cleanup, add and manage Table Of Contents (TOC) of pdf and djvu document
 TOC-mode is a package for creating, cleaning, adding and managing the
 Table Of Contents (TOC) of pdf and djvu documents.
 
-* Important
-Currently only files with a text layer are supported. A feature to extract the
-TOC via OCR will probably be added soon. Until then, the python
-[[https://pypi.org/project/document-contents-extractor/][documents-contents-extractor]] package is recommended for extraction of TOC via
-OCR.
+This package is also provided by the [[https://github.com/dalanicolai/toc-layer][toc-layer for Spacemacs]]
 
+
+** Features:
+  - Extract Table of Contents from documents via text layer or via Tesseract OCR
+  - Auto detect indentation levels from leading spaces or by selecting level separater
+  - Quickly adjust pagenumbers while viewing the document
+  - Add Table of Contents to document
+    
+** Important
 For djvu documents, only outlines with maximum level deepness of 1 are correctly
 parsed. For outlines with level deepness of 2 not all levels are set to correct
 level because the algorithm in the =toc-parse-djvused= function does not parse
 such files correctly yet (you are welcome to 'repair' the algorithm to produce
 the correct syntax as it is described [[http://djvu.sourceforge.net/doc/man/djvused.html#lbAW][on the djvused website here]]).
-
 
 
 * Requirements
@@ -106,3 +109,25 @@ By default, the TOC is simply added to the original file. ONLY FOR PDF's, if the
 to a copy of the original pdf file with the path as defined by the variable
 ~toc-destination-file-name~. Either a relative path to the original file
 directory or an absolute path can be given.
+
+
+* Key bindings
+
+all-modes (i.e. all steps)
+| Key Binding | Description          |
+|-------------+----------------------|
+| ~C-c C-c~     | dispatch (next step) |
+toc-cleanup-mode
+| ~C-c C-j~ | toc-join-next-unnumbered-lines |
+toc-mode (tablist)
+| ~TAB~            | preview/jump-to-page                                                 |
+| ~right/left~     | toc-in/decrease-remaining                                            |
+| ~C-right/C-left~ | toc-in/decrease-remaining and view page                           |
+| ~S-right/S-left~ | in/decrease pagenumber current entry                                 |
+| ~C-down/C-up~    | scroll document other window (only when other buffer shows document) |
+| ~S-down/S-up~    | full page scroll document other window ( idem )                      |
+
+
+* Alternatives
+For TOC extraction: [[https://pypi.org/project/document-contents-extractor/][documents-contents-extractor]]
+For adding TOC to document (pdf and djvu): [[http://handyoutlinerfo.sourceforge.net/][HandyOutliner]]
