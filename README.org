@@ -52,6 +52,8 @@ page each followed by =RET=. *For PDF extraction with OCR, currently it is requi
 *to view all contents pages once before extraction* (toc-mode uses the cached file
 data).
 
+[[toc-mode-extract.gif]]
+
 A buffer with the, somewhat cleaned up, extracted text will open in TOC-cleanup
 mode. Prefix command with the universal argument (=C-u=) to omit clean and get the
 raw text.
