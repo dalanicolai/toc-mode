@@ -21,12 +21,20 @@ level because the algorithm in the =toc-parse-djvused= function does not parse
 such files correctly yet (you are welcome to 'repair' the algorithm to produce
 the correct syntax as it is described [[http://djvu.sourceforge.net/doc/man/djvused.html#lbAW][on the djvused website here]]).
 
+* Installation
 
-* Requirements
+For Spacemacs use the [[https://github.com/dalanicolai/toc-layer][toc-layer for Spacemacs]]. Installation instruction are found on that page.
+
+For regular Emacs users, well... you probably know how to install packages.
+
+** Requirements
 Currently the package requires the ~pdftotext~ (part of poppler-utils), ~pdfoutline~
 (part of [[https://launchpad.net/ubuntu/bionic/+package/fntsample][fntsample]]) and ~djvused~ (part of [[http://djvu.sourceforge.net/][http://djvu.sourceforge.net/]]) command
 line utilities to be available. Extraction with OCR requires the ~tesseract~ command
 line utility to be available.
+
+
+
 
 * Usage
 Extraction and adding contents to a document is done in 4 steps:
