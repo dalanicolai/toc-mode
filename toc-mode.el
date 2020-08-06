@@ -365,10 +365,13 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
     (define-key map [C-down] 'toc-scroll-pdf-other-window-down)
     (define-key map [C-up] 'toc-scroll-pdf-other-window-up)
     (define-key map "\C-c\C-c" 'toc-tablist-to-toc-source)
+    (define-key map "\C-c\C-c" 'toc-tablist-to-toc-source)
+    (define-key map "\S-j" 'evil-scroll-page-down)
+    (define-key map "\S-k" 'evil-scroll-page-up)
     map))
 
 (define-derived-mode toc-tabular-mode
-  tabulated-list-mode "TOC"
+  tabulated-list-mode "TOC-tabular"
   "Major mode for Table Of Contents."
   (setq-local tabulated-list-format [("level" 10 nil) ("name" 80 nil) ("page" 1 nil)])
   (tabulated-list-init-header))
