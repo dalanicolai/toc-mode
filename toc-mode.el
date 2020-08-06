@@ -70,7 +70,7 @@ For DJVU the old DJVU file is replaced by default"
   ;; (re-search-forward "^ *[ivx0-9\\.]+ *$" nil t)
   ;; (replace-match "")
   (while (not (eobp))
-    (re-search-forward "^ *[ivx0-9\\.]* *$")
+    (re-search-forward "^[\f ]*[ivx0-9\\.]* *$")
     (replace-match "")
     (forward-line 1))
   )
@@ -99,9 +99,9 @@ For DJVU the old DJVU file is replaced by default"
   (if arg
       (toc-cleanup-dots-ocr)
     (toc-cleanup-dots))
-  ;; (toc-cleanup-lines-roman-string)
+  (toc-cleanup-lines-roman-string)
   (toc-cleanup-blank-lines)
-  (toc-join-next-unnumbered-lines)
+  ;; (toc-join-next-unnumbered-lines)
   )
 
 (defun get-index-levels (seperator)
@@ -136,7 +136,8 @@ For DJVU the old DJVU file is replaced by default"
 
 ;;; toc extract
 (defun document-extract-pages-text (startpage endpage)
-  (let* ((source-buffer (current-buffer))
+  (let* ((default-process-coding-system '(windows-1252-unix . utf-8-unix))
+         (source-buffer (current-buffer))
          (ext (url-file-extension (buffer-file-name (current-buffer))))
          (shell-command (cond ((string= ".pdf" ext) "pdftotext -f %s -l %s -layout %s -")
                               ((string= ".djvu" ext) "djvutxt --page=%s-%s %s")
@@ -532,5 +533,5 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
 
 
 (provide 'toc-mode)
-;;; document-outliner.el ends here
 
+;;; toc-mode.el ends here
