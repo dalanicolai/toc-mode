@@ -381,6 +381,8 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
   (let ((source-buffer buffer)
         (toc-tablist (toc-convert-to-tabulated-list)))
     (switch-to-buffer (concat (buffer-name) ".list"))
+    (if (fboundp 'golden-ratio-mode)
+        (golden-ratio-mode))
     (toc-tabular-mode)
     (setq-local doc-buffer source-buffer)
     (setq-local tabulated-list-entries toc-tablist)
