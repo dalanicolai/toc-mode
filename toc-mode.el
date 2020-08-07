@@ -150,6 +150,8 @@ For DJVU the old DJVU file is replaced by default"
          (buffer (get-buffer-create (file-name-sans-extension (buffer-name)))))
     (switch-to-buffer buffer)
     (toc-cleanup-mode) ;; required before setting local variable
+    (when (fboundp 'flyspell-mode)
+      flyspell-mode)
     (setq-local doc-buffer source-buffer)
     (insert text)
     ;; (kill-whole-line)
@@ -167,29 +169,32 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
 ;;;###autoload
 (defun toc-extract-pages-ocr (startpage endpage arg)
   (interactive "nEnter start-pagenumber for extraction: \nnEnter end-pagenumber for extraction: \nP")
-    (let* ((source-buffer (current-buffer))
-           (ext (url-file-extension (buffer-file-name (current-buffer))))
-           (text "")
-           (buffer (file-name-sans-extension (buffer-name))))
-      (while (<= startpage (+ endpage))
-        (let ((file (cond ((string= ".pdf" ext)
-                           (make-temp-file "pageimage"
-                                           nil
-                                           (number-to-string startpage)
-                                           (pdf-cache-get-image startpage 600)))
-                          ((string= ".djvu" ext)
-                           (djvu-goto-page startpage)
-                           (make-temp-file "pageimage"
-                                           nil
-                                           (number-to-string startpage)
-                                           (image-property djvu-doc-image :data))))))
-               (call-process "tesseract" nil (list buffer nil) nil file "stdout" "--psm" "6")
-               (setq startpage (1+ startpage))))
-      (switch-to-buffer buffer)
-      (toc-cleanup-mode) ;; required before setting local variable
-      (setq-local doc-buffer source-buffer)
-      (unless arg
-        (toc-cleanup startpage t))))
+  (let* ((page startpage)
+         (source-buffer (current-buffer))
+         (ext (url-file-extension (buffer-file-name (current-buffer))))
+         (text "")
+         (buffer (file-name-sans-extension (buffer-name))))
+    (while (<= page (+ endpage))
+      (let ((file (cond ((string= ".pdf" ext)
+                         (make-temp-file "pageimage"
+                                         nil
+                                         (number-to-string page)
+                                         (pdf-cache-get-image page 600)))
+                        ((string= ".djvu" ext)
+                         (djvu-goto-page page)
+                         (make-temp-file "pageimage"
+                                         nil
+                                         (number-to-string page)
+                                         (image-property djvu-doc-image :data))))))
+        (call-process "tesseract" nil (list buffer nil) nil file "stdout" "--psm" "6")
+        (setq page (1+ page))))
+    (switch-to-buffer buffer)
+    (toc-cleanup-mode) ;; required before setting local variable
+    (when (fboundp 'flyspell-mode)
+        (flyspell-mode))
+    (setq-local doc-buffer source-buffer)
+    (unless arg
+      (toc-cleanup startpage t))))
 
 ;;;###autoload
 (defun toc-extract-outline ()
@@ -381,7 +386,7 @@ Use with the universal argument (C-u) omits cleanup to get the unprocessed text.
   (let ((source-buffer buffer)
         (toc-tablist (toc-convert-to-tabulated-list)))
     (switch-to-buffer (concat (buffer-name) ".list"))
-    (if (fboundp 'golden-ratio-mode)
+    (when (fboundp 'golden-ratio-mode)
         (golden-ratio-mode))
     (toc-tabular-mode)
     (setq-local doc-buffer source-buffer)
