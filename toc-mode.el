@@ -252,9 +252,11 @@ ARG (\\[universal-argument]) to enter different separators."
 ;;; toc extract
 (defun toc-document-extract-pages-text (startpage endpage)
   "Extract text from text layer of current document from STARTPAGE to ENDPAGE."
-  (let* ((default-process-coding-system '(windows-1252-unix . utf-8-unix))
-         (source-buffer (current-buffer))
+  (let* ((source-buffer (current-buffer))
          (ext (url-file-extension (buffer-file-name (current-buffer))))
+         (default-process-coding-system
+           (cond ((string= ".pdf" ext)'(windows-1252-unix . utf-8-unix))
+                 ((string= ".djvu" ext) '(utf-8-unix . utf-8-unix))))
          (shell-command (cond ((string= ".pdf" ext) "pdftotext -f %s -l %s -layout %s -")
                               ((string= ".djvu" ext) "djvutxt --page=%s-%s %s")
                               (t (error "Buffer-filename does not have pdf or djvu extension"))))
