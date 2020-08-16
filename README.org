@@ -14,13 +14,6 @@ This package is also provided by the [[https://github.com/dalanicolai/toc-layer]
   - Quickly adjust pagenumbers while viewing the document
   - Add Table of Contents to document
     
-** Important
-For djvu documents, only outlines with maximum level deepness of 1 are correctly
-parsed. For outlines with level deepness of 2 not all levels are set to correct
-level because the algorithm in the =toc-parse-djvused= function does not parse
-such files correctly yet (you are welcome to 'repair' the algorithm to produce
-the correct syntax as it is described [[http://djvu.sourceforge.net/doc/man/djvused.html#lbAW][on the djvused website here]]).
-
 * Installation
 
 For Spacemacs use the [[https://github.com/dalanicolai/toc-layer][toc-layer for Spacemacs]]. Installation instruction are found on that page.

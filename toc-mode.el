@@ -34,7 +34,7 @@
 
 ;; Important: For djvu documents, only outlines with maximum level deepness of 1
 ;; are correctly parsed. For outlines with level deepness of 2 not all levels
-;; are set to correct level because the algorithm in the toc-parse-djvused
+;; are set to correct level because the algorithm in the toc--parse-djvused
 ;; function does not parse such files correctly yet (you are welcome to ‘repair’
 ;; the algorithm to produce the correct syntax as it is described on the djvused
 ;; website here).
@@ -79,7 +79,7 @@
 ;; automatically to the next line not ending with a number and joins it with the
 ;; next line. If the indentation structure of the different lines does not
 ;; correspond with the levels, then the levels can be set automatically from the
-;; number of separatorss in the indices with M-x toc-cleanup-set-level-by-index.
+;; number of separatorss in the indices with M-x toc--cleanup-set-level-by-index.
 ;; The default separators is a . but a different separators can be entered by
 ;; preceding the function invocation with the universal argument (C-u). Some
 ;; documents contain a structure like
@@ -124,7 +124,7 @@
 ;;   ~C-c C-c~         dispatch (next step)
 
 ;; toc-cleanup-mode
-;;  ~C-c C-j~          toc-join-next-unnumbered-lines
+;;  ~C-c C-j~          toc--join-next-unnumbered-lines
 
 ;; toc-mode (tablist)
 ;;  ~TAB~              preview/jump-to-page
@@ -153,7 +153,7 @@ For DJVU the old DJVU file is replaced by default"
 ;;;; toc-extract and cleanup
 
 ;;; toc-cleanup
-(defun toc-cleanup-dots ()
+(defun toc--cleanup-dots ()
   "Remove dots between heading its title and page number."
   (interactive)
   (beginning-of-buffer)
@@ -162,19 +162,19 @@ For DJVU the old DJVU file is replaced by default"
     (replace-match " \\2")
     (forward-line 1)))
 
-(defun toc-cleanup-dots-ocr ()
+(defun toc--cleanup-dots-ocr ()
   "Remove dots between heading its title and page number.
-Like `toc-cleanup-dots' but more suited for use after OCR"
+Like `toc--cleanup-dots' but more suited for use after OCR"
   (beginning-of-buffer)
   (while (re-search-forward "\\([0-9\\. \\-]*\\)\\( [0-9]* *\\)$" nil t)
     (replace-match " \\2")))
 
-(defun toc-cleanup-lines-contents-string ()
+(defun toc--cleanup-lines-contents-string ()
   "Delete all lines containing the string \"contents\"."
   (interactive)
   (flush-lines "contents"))
 
-(defun toc-cleanup-lines-roman-string ()
+(defun toc--cleanup-lines-roman-string ()
   "Delete all lines that contain only linefeeds and/or blanks and/or roman numerals."
   (interactive)
   (beginning-of-buffer)
@@ -191,31 +191,31 @@ Like `toc-cleanup-dots' but more suited for use after OCR"
   (beginning-of-buffer)
   (flush-lines "^ *$"))
 
-(defun toc-join-next-unnumbered-lines ()
+(defun toc--join-next-unnumbered-lines ()
   "Search from point for first occurence of line not ending with Western numerals."
   (interactive)
   (re-search-forward "[^0-9]\\s-*$" nil t)
   (join-line 1))
 
-(defun toc-jump-next-overindexed-index ()
+(defun toc--jump-next-overindexed-index ()
   "Jump to next line with unwanted dot behind its index."
   (interactive)
   (re-search-forward "^[0-9\\.]*\\. " nil t))
 
-(defun toc-cleanup (startpage &optional arg)
+(defun toc--cleanup (startpage &optional arg)
   "Cleanup extracted Table Of Contents by running a series of cleanup functions."
   (interactive)
   (beginning-of-buffer)
   (when (search-forward "contents" nil t)
     (replace-match (format "Contents %s" startpage)))
-  (toc-cleanup-lines-contents-string)
+  (toc--cleanup-lines-contents-string)
   (if arg
-      (toc-cleanup-dots-ocr)
-    (toc-cleanup-dots))
-  (toc-cleanup-lines-roman-string)
+      (toc--cleanup-dots-ocr)
+    (toc--cleanup-dots))
+  (toc--cleanup-lines-roman-string)
   (toc-cleanup-blank-lines))
 
-(defun toc-get-section-inidices (separators)
+(defun toc--get-section-inidices (separators)
   "Determine index part of current line. Counting the number of SEPARATORS."
   (let* ((string (thing-at-point 'line t))
          (sep (cond (separators)
@@ -223,15 +223,15 @@ Like `toc-cleanup-dots' but more suited for use after OCR"
     (string-match (format "^\\([[:alnum:]]+%s\\)*" sep) string)
     (match-string 0 string)))
 
-(defun toc-count-level-by-index (separators)
+(defun toc--count-level-by-index (separators)
   "Determine level of current line in TOC tree by counting SEPARATORS."
-  (let* ((index (toc-get-section-inidices separators))
+  (let* ((index (toc--get-section-inidices separators))
          (sep (cond (separators)
                     ("\\.")))
          (string-list (split-string index sep t)))
     (length string-list)))
 
-(defun toc-cleanup-set-level-by-index (&optional arg)
+(defun toc--cleanup-set-level-by-index (&optional arg)
   "Automatic set indentation by number of separatorss in index.
 By default uses dots as separators. Prepend with universal
 ARG (\\[universal-argument]) to enter different separators."
@@ -245,12 +245,12 @@ ARG (\\[universal-argument]) to enter different separators."
       (replace-match ""))
     (beginning-of-buffer)
     (while (not (eobp))
-      (let* ((level (toc-count-level-by-index separators)))
+      (let* ((level (toc--count-level-by-index separators)))
         (dotimes (x level) (insert " "))
         (forward-line 1)))))
 
 ;;; toc extract
-(defun toc-document-extract-pages-text (startpage endpage)
+(defun toc--document-extract-pages-text (startpage endpage)
   "Extract text from text layer of current document from STARTPAGE to ENDPAGE."
   (let* ((source-buffer (current-buffer))
          (ext (url-file-extension (buffer-file-name (current-buffer))))
@@ -280,9 +280,9 @@ Extract from STARTPAGE to ENDPAGE. Use with the universal
 ARG (\\[universal-argument]) omits cleanup to get the unprocessed
 text."
   (interactive "nEnter start-pagenumber for extraction: \nnEnter end-pagenumber for extraction: \nP")
-  (toc-document-extract-pages-text startpage endpage)
+  (toc--document-extract-pages-text startpage endpage)
   (unless arg
-    (toc-cleanup startpage)))
+    (toc--cleanup startpage)))
 
 ;;;###autoload
 (defun toc-extract-pages-ocr (startpage endpage arg)
@@ -316,7 +316,7 @@ unprocessed text."
       (flyspell-mode))
     (setq-local doc-buffer source-buffer)
     (unless arg
-      (toc-cleanup startpage t))))
+      (toc--cleanup startpage t))))
 
 ;;;###autoload
 (defun toc-extract-outline ()
@@ -337,17 +337,17 @@ unprocessed text."
     (setq-local doc-buffer source-buffer)
     (insert text)))
 
-(defun toc-create-tablist-buffer ()
+(defun toc--create-tablist-buffer ()
   "Create tablist buffer, from cleaned up Table of Contents buffer, for easy page number adjustment."
   (interactive)
-  (toc-list doc-buffer))
+  (toc--list doc-buffer))
 
 ;;;; toc major modes
 
 (defvar toc-cleanup-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-c" 'toc-create-tablist-buffer)
-    (define-key map "\C-c\C-j" 'toc-join-next-unnumbered-lines)
+    (define-key map "\C-c\C-c" 'toc--create-tablist-buffer)
+    (define-key map "\C-c\C-j" 'toc--join-next-unnumbered-lines)
     map))
 
 (define-derived-mode toc-cleanup-mode
@@ -364,19 +364,19 @@ unprocessed text."
         (end (match-end 0)))
     (- end start)))
 
-(defun toc-level ()
-  "Determine level of current line in TOC tree by somparing number of spaces with other lines in buffer."
-  (interactive)
-  (let (levels)
-    (beginning-of-buffer)
-    (while (not (eobp))
-      (let ((spaces (toc-count-leading-spaces)))
-        (unless (member spaces levels)
-          (setq levels (append levels (list spaces))))
-        (forward-line 1)))
-    (progn levels)))
+;; (defun toc-level ()
+;;   "Determine level of current line in TOC tree by comparing number of spaces with other lines in buffer."
+;;   (interactive)
+;;   (let (levels)
+;;     (beginning-of-buffer)
+;;     (while (not (eobp))
+;;       (let ((spaces (toc-count-leading-spaces)))
+;;         (unless (member spaces levels)
+;;           (setq levels (append levels (list spaces))))
+;;         (forward-line 1)))
+;;     (progn levels)))
 
-(defun toc-convert-to-tabulated-list ()
+(defun toc--convert-to-tabulated-list ()
   "Parse and prepare content of current buffer for `toc-tabular-mode'."
   (interactive)
   (beginning-of-buffer)
@@ -398,7 +398,7 @@ unprocessed text."
         (forward-line)))
     lines))
 
-(defun toc-increase ()
+(defun toc--increase ()
   "Increase pagenumber of current entry."
   (interactive)
   (tabulated-list-set-col
@@ -406,7 +406,7 @@ unprocessed text."
    (number-to-string (+ (string-to-number (aref (tabulated-list-get-entry) 2)) 1))
    t))
 
-(defun toc-decrease ()
+(defun toc--decrease ()
   "Decrease pagenumber of current entry."
   (interactive)
   (tabulated-list-set-col
@@ -414,7 +414,7 @@ unprocessed text."
    (number-to-string (- (string-to-number (aref (tabulated-list-get-entry) 2)) 1))
    t))
 
-(defun toc-increase-remaining ()
+(defun toc--increase-remaining ()
   "Increase pagenumber of current entry and all entries below."
   (interactive)
   (save-excursion
@@ -425,7 +425,7 @@ unprocessed text."
        t)
       (forward-line 1))))
 
-(defun toc-decrease-remaining ()
+(defun toc--decrease-remaining ()
   "Decrease pagenumber of current entry and all entries below."
   (interactive)
   (save-excursion
@@ -436,7 +436,7 @@ unprocessed text."
        t)
       (forward-line 1))))
 
-(defun toc-tablist-follow ()
+(defun toc--tablist-follow ()
   "Preview pagenumber of current line in separate document buffer."
   (interactive)
   (let ((ext (url-file-extension (buffer-file-name doc-buffer)))
@@ -446,19 +446,19 @@ unprocessed text."
           ((string= ".djvu" ext) (djvu-goto-page page)))
     (other-window 1)))
 
-(defun toc-increase-remaining-and-follow ()
+(defun toc--increase-remaining-and-follow ()
   "Increase pagenumber of current entry and all entries below and preview page in separate document buffer."
   (interactive)
-  (toc-increase-remaining)
-  (toc-tablist-follow))
+  (toc--increase-remaining)
+  (toc--tablist-follow))
 
-(defun toc-decrease-remaining-and-follow ()
+(defun toc--decrease-remaining-and-follow ()
   "Decrease pagenumber of current entry and all entries below and preview page in separate document buffer."
   (interactive)
-  (toc-decrease-remaining)
-  (toc-tablist-follow))
+  (toc--decrease-remaining)
+  (toc--tablist-follow))
 
-(defun toc-scroll-other-window-page-up ()
+(defun toc--scroll-other-window-page-up ()
   "Scroll page up in document buffer from current buffer."
   (interactive)
   (other-window 1)
@@ -467,7 +467,7 @@ unprocessed text."
           ((string= ".djvu" ext) (djvu-next-page 1))))
   (other-window 1))
 
-(defun toc-scroll-other-window-page-down ()
+(defun toc--scroll-other-window-page-down ()
   "Scroll page down in document buffer from current buffer."
   (interactive)
   (other-window 1)
@@ -476,35 +476,39 @@ unprocessed text."
           ((string= ".djvu" ext) (djvu-prev-page 1))))
   (other-window 1))
 
-(defun toc-scroll-pdf-other-window-down ()
+(defun toc--scroll-pdf-other-window-down ()
   "Scroll down in document buffer from current buffer."
   (interactive)
   (other-window 1)
-  (pdf-view-scroll-up-or-next-page 1)
+  (let ((ext (url-file-extension (buffer-file-name (current-buffer)))))
+    (cond ((string= ".pdf" ext) (pdf-view-scroll-up-or-next-page 1))
+          ((string= ".djvu" ext) (djvu-scroll-up-or-next-page))))
   (other-window 1))
 
-(defun toc-scroll-pdf-other-window-up ()
+(defun toc--scroll-pdf-other-window-up ()
   "Scroll up in document buffer from current buffer."
   (interactive)
   (other-window 1)
-  (pdf-view-scroll-down-or-previous-page 1)
+  (let ((ext (url-file-extension (buffer-file-name (current-buffer)))))
+    (cond ((string= ".pdf" ext) (pdf-view-scroll-down-or-previous-page 1))
+          ((string= ".djvu" ext) (djvu-scroll-down-or-previous-page))))
   (other-window 1))
 
 (defvar toc-tabular-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map [right] 'toc-increase-remaining)
-    (define-key map [left] 'toc-decrease-remaining)
-    (define-key map [S-right] 'toc-increase)
-    (define-key map [S-left] 'toc-decrease)
-    (define-key map [C-right] 'toc-increase-remaining-and-follow)
-    (define-key map [C-left] 'toc-decrease-remaining-and-follow)
-    (define-key map [tab] 'toc-tablist-follow)
-    (define-key map [S-down] 'toc-scroll-other-window-page-up)
-    (define-key map [S-up] 'toc-scroll-other-window-page-down)
-    (define-key map [C-down] 'toc-scroll-pdf-other-window-down)
-    (define-key map [C-up] 'toc-scroll-pdf-other-window-up)
-    (define-key map "\C-c\C-c" 'toc-tablist-to-toc-source)
-    (define-key map "\C-c\C-c" 'toc-tablist-to-toc-source)
+    (define-key map [right] 'toc--increase-remaining)
+    (define-key map [left] 'toc--decrease-remaining)
+    (define-key map [S-right] 'toc--increase)
+    (define-key map [S-left] 'toc--decrease)
+    (define-key map [C-right] 'toc--increase-remaining-and-follow)
+    (define-key map [C-left] 'toc--decrease-remaining-and-follow)
+    (define-key map [tab] 'toc--tablist-follow)
+    (define-key map [S-down] 'toc--scroll-other-window-page-up)
+    (define-key map [S-up] 'toc--scroll-other-window-page-down)
+    (define-key map [C-down] 'toc--scroll-pdf-other-window-down)
+    (define-key map [C-up] 'toc--scroll-pdf-other-window-up)
+    (define-key map "\C-c\C-c" 'toc--tablist-to-toc-source)
+    (define-key map "\C-c\C-c" 'toc--tablist-to-toc-source)
     (define-key map "\S-j" 'evil-scroll-page-down)
     (define-key map "\S-k" 'evil-scroll-page-up)
     map))
@@ -516,11 +520,11 @@ unprocessed text."
   (setq-local tabulated-list-format [("level" 10 nil) ("name" 80 nil) ("page" 1 nil)])
   (tabulated-list-init-header))
 
-(defun toc-list (buffer)
+(defun toc--list (buffer)
   "Create, BUFFER, new tabular-mode-buffer for easy pagenumber adjusment."
   (interactive)
   (let ((source-buffer buffer)
-        (toc-tablist (toc-convert-to-tabulated-list)))
+        (toc-tablist (toc--convert-to-tabulated-list)))
     (switch-to-buffer (concat (buffer-name) ".list"))
     (when (fboundp 'golden-ratio-mode)
       (golden-ratio-mode))
@@ -533,7 +537,7 @@ unprocessed text."
 
 (defvar toc-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-c" 'toc-add-to-doc)
+    (define-key map "\C-c\C-c" 'toc--add-to-doc)
     map))
 
 (define-derived-mode toc-mode
@@ -543,7 +547,7 @@ unprocessed text."
 
 
 ;;; pdf parse tablist to
-(defun toc-tablist-to-pdfoutline ()
+(defun toc--tablist-to-pdfoutline ()
   "Parse and prepare tablist-mode-buffer to source input.
 Displays results in a newlycreated buffer for use as source input
 to `pdfoutline' shell command."
@@ -561,52 +565,55 @@ to `pdfoutline' shell command."
     (setq-local doc-buffer source-buffer)
     (insert text)))
 
-;;;; djvu parse tablist to outline
-
-(defun toc-parse-djvused (level)
-  "Parse and prepare, from tablist-mode-buffer, for use as source input to `pdfoutline' shell command. LEVEL is used as argument by the recursuve algorithm."
-  (let* ((v (tabulated-list-get-entry))
-         (sexp (list (aref v 1) (format "#%s" (aref v 2)))))
-    (forward-line 1)
-    (if (not (eobp))
-        (let ((v (tabulated-list-get-entry)))
-          (cond ((> (string-to-number (aref v 0)) level)
-                 (setq sexp
-                       (list (append sexp (toc-parse-djvused (string-to-number (aref v 0)))))))
-                ((= (string-to-number (aref v 0)) level)
-                 (setq sexp (cons
-                             sexp
-                             (toc-parse-djvused (string-to-number (aref v 0))))))
-                ((< (string-to-number (aref v 0)) level)
-                 (list sexp))))
-      (list sexp))))
-
+;;; djvu parse tablist to outline
 (defun toc-tablist-to-djvused ()
-  "Parse and prepare, from tablist-mode-buffer, a new buffer for use as source input to `djvused' shell command."
-  (beginning-of-buffer)
-  (let* ((bookmarks '(bookmarks))
-         (outline (append bookmarks (toc-parse-djvused 0))))
+  (interactive)
+  (let ((source-buffer doc-buffer)
+        (buff (get-buffer-create
+               (concat
+                (file-name-sans-extension (buffer-name))
+                ".txt"))))
+    (with-current-buffer buff
+      (insert "(bookmarks "))
+    (beginning-of-buffer)
     (while (not (eobp))
-      (setq outline (append outline (toc-parse-djvused 0))))
-    (let ((source-buffer doc-buffer)
-          (text (format "%S" outline)))
-      (switch-to-buffer (find-file (concat (file-name-sans-extension (buffer-name)) ".txt")))
-      (erase-buffer)
-      (toc-mode)
-      (setq-local doc-buffer source-buffer)
-      (insert text))))
+      (let* ((v (tabulated-list-get-entry))
+             (level-current (string-to-number (aref v 0)))
+             (sexp (list (aref v 1) (format "#%s" (aref v 2))))
+             (v-next (progn (forward-line) (tabulated-list-get-entry)))
+             (level-next (when v-next (string-to-number (aref v-next 0)))))
+        (if level-next
+            (with-current-buffer buff
+              ;; (end-of-buffer)
+              (cond ((= level-next level-current)
+                     (insert (format "(\"%s\" \"%s\") " (car sexp) (nth 1 sexp))))
+                    ((> level-next level-current)
+                     (insert (format "(\"%s\" \"%s\" " (car sexp) (nth 1 sexp))))
+                    ((< level-next level-current)
+                     (insert (format "(\"%s\" \"%s\")" (car sexp) (nth 1 sexp)))
+                     (let ((level-diff (- level-current level-next)))
+                       (while (> level-diff 0)
+                         (insert ")")
+                         (setq level-diff (1- level-diff)))))))
+          (forward-line))))
+    (previous-line)
+    (let ((v (tabulated-list-get-entry)))
+          (switch-to-buffer buff)
+          (insert (format " (\"%s\" \"#%s\"))" (aref v 1) (aref v 2)))
+          (toc-mode)
+          (setq-local doc-buffer source-buffer))))
 
 (defun toc-tablist-to-toc-source ()
   "Parse and prepare, from tablist-mode-buffer, a new buffer for use as source input to `pdfoutline' or `djvused' shell command."
   (interactive)
   (let ((ext (url-file-extension (buffer-file-name doc-buffer))))
-    (cond ((string= ".pdf" ext) (toc-tablist-to-pdfoutline))
-          ((string= ".djvu" ext) (print "this is DJVU") (toc-tablist-to-djvused))
+    (cond ((string= ".pdf" ext) (toc--tablist-to-pdfoutline))
+          ((string= ".djvu" ext) (print "this is DJVU") (toc--tablist-to-djvused))
           (t (error "Buffer-source-file does not have pdf or djvu extension")))))
 
 
 ;;;; add outline to document
-(defun toc-add-to-pdf ()
+(defun toc--add-to-pdf ()
   "Combine with add-toc-to-djvu in add-toc-to-document when ready."
   (interactive)
   (save-buffer)
@@ -617,7 +624,7 @@ to `pdfoutline' shell command."
                     (concat (file-name-sans-extension (buffer-name)) ".pdf")
                   toc-destination-file-name)))
 
-(defun toc-add-to-djvu ()
+(defun toc--add-to-djvu ()
   "Combine with add-toc-to-djvu in add-toc-to-document when ready."
   (interactive)
   (save-buffer)
@@ -629,14 +636,14 @@ to `pdfoutline' shell command."
                     (concat (file-name-sans-extension (buffer-name)) ".djvu"))))))
 
 
-(defun toc-add-to-doc ()
+(defun toc--add-to-doc ()
   "Add Table Of Contents to original document.
 The text of the current buffer is passed as source input to either the
 `pdfoutline' or `djvused' shell command."
   (interactive)
   (let ((ext (url-file-extension (buffer-file-name doc-buffer))))
-    (cond ((string= ".pdf" ext) (toc-add-to-pdf))
-          ((string= ".djvu" ext) (toc-add-to-djvu)))))
+    (cond ((string= ".pdf" ext) (toc--add-to-pdf))
+          ((string= ".djvu" ext) (toc--add-to-djvu)))))
 
 (provide 'toc-mode)
 
