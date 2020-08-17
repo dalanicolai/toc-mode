@@ -360,8 +360,8 @@ unprocessed text."
 
 (defvar toc-cleanup-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-c" 'toc--create-tablist-buffer)
-    (define-key map "\C-c\C-j" 'toc--join-next-unnumbered-lines)
+    (define-key map "\C-c\C-c" #'toc--create-tablist-buffer)
+    (define-key map "\C-c\C-j" #'toc--join-next-unnumbered-lines)
     map))
 
 (define-derived-mode toc-cleanup-mode
@@ -395,8 +395,8 @@ unprocessed text."
                (list (list nil
                            (vector
                             (number-to-string (cl-position spaces levels))
-                            (mapconcat 'identity (butlast line-list) " ")
-                            (mapconcat 'identity (last line-list) " "))))))
+                            (mapconcat #'identity (butlast line-list) " ")
+                            (mapconcat #'identity (last line-list) " "))))))
         (forward-line)))
     lines))
 
@@ -498,21 +498,21 @@ unprocessed text."
 
 (defvar toc-tabular-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map [right] 'toc--increase-remaining)
-    (define-key map [left] 'toc--decrease-remaining)
-    (define-key map [S-right] 'toc--increase)
-    (define-key map [S-left] 'toc--decrease)
-    (define-key map [C-right] 'toc--increase-remaining-and-follow)
-    (define-key map [C-left] 'toc--decrease-remaining-and-follow)
-    (define-key map [tab] 'toc--tablist-follow)
-    (define-key map [S-down] 'toc--scroll-other-window-page-up)
-    (define-key map [S-up] 'toc--scroll-other-window-page-down)
-    (define-key map [C-down] 'toc--scroll-pdf-other-window-down)
-    (define-key map [C-up] 'toc--scroll-pdf-other-window-up)
-    (define-key map "\C-c\C-c" 'toc--tablist-to-toc-source)
-    (define-key map "\C-c\C-c" 'toc--tablist-to-toc-source)
-    (define-key map "\S-j" 'evil-scroll-page-down)
-    (define-key map "\S-k" 'evil-scroll-page-up)
+    (define-key map [right] #'toc--increase-remaining)
+    (define-key map [left] #'toc--decrease-remaining)
+    (define-key map [S-right] #'toc--increase)
+    (define-key map [S-left] #'toc--decrease)
+    (define-key map [C-right] #'toc--increase-remaining-and-follow)
+    (define-key map [C-left] #'toc--decrease-remaining-and-follow)
+    (define-key map [tab] #'toc--tablist-follow)
+    (define-key map [S-down] #'toc--scroll-other-window-page-up)
+    (define-key map [S-up] #'toc--scroll-other-window-page-down)
+    (define-key map [C-down] #'toc--scroll-pdf-other-window-down)
+    (define-key map [C-up] #'toc--scroll-pdf-other-window-up)
+    (define-key map "\C-c\C-c" #'toc--tablist-to-toc-source)
+    (define-key map "\C-c\C-c" #'toc--tablist-to-toc-source)
+    (define-key map "\S-j" #'evil-scroll-page-down)
+    (define-key map "\S-k" #'evil-scroll-page-up)
     map))
 
 (define-derived-mode toc-tabular-mode
@@ -539,7 +539,7 @@ unprocessed text."
 
 (defvar toc-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-c\C-c" 'toc--add-to-doc)
+    (define-key map "\C-c\C-c" #'toc--add-to-doc)
     map))
 
 (define-derived-mode toc-mode
