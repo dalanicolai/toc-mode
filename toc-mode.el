@@ -566,7 +566,7 @@ to `pdfoutline' shell command."
     (insert text)))
 
 ;;; djvu parse tablist to outline
-(defun toc-tablist-to-djvused ()
+(defun toc--tablist-to-djvused ()
   (interactive)
   (let ((source-buffer doc-buffer)
         (buff (get-buffer-create
@@ -603,7 +603,7 @@ to `pdfoutline' shell command."
           (toc-mode)
           (setq-local doc-buffer source-buffer))))
 
-(defun toc-tablist-to-toc-source ()
+(defun toc--tablist-to-toc-source ()
   "Parse and prepare, from tablist-mode-buffer, a new buffer for use as source input to `pdfoutline' or `djvused' shell command."
   (interactive)
   (let ((ext (url-file-extension (buffer-file-name doc-buffer))))
