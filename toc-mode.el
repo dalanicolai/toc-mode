@@ -136,6 +136,7 @@
 
 (require 'pdf-tools nil t)
 (require 'djvu nil t)
+(require 'evil nil t)
 
 (defvar djvu-doc-image)
 (defvar doc-buffer)
@@ -151,6 +152,8 @@
 (declare-function djvu-prev-page "djvu")
 (declare-function djvu-scroll-up-or-next-page "djvu")
 (declare-function djvu-scroll-down-or-previous-page "djvu")
+(declare-function evil-scroll-page-down "evil-commands")
+(declare-function evil-scroll-page-up "evil-commands")
 
 (defgroup toc nil
   "Setting for the toc-mode package"
