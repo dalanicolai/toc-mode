@@ -156,7 +156,7 @@ For DJVU the old DJVU file is replaced by default"
 (defun toc--cleanup-dots ()
   "Remove dots between heading its title and page number."
   (interactive)
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (while (not (eobp))
     (re-search-forward "\\([\\. ]*\\)\\([0-9ivx]*\\) *$")
     (replace-match " \\2")
@@ -165,7 +165,7 @@ For DJVU the old DJVU file is replaced by default"
 (defun toc--cleanup-dots-ocr ()
   "Remove dots between heading its title and page number.
 Like `toc--cleanup-dots' but more suited for use after OCR"
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (while (re-search-forward "\\([0-9\\. \\-]*\\)\\( [0-9]* *\\)$" nil t)
     (replace-match " \\2")))
 
@@ -177,9 +177,7 @@ Like `toc--cleanup-dots' but more suited for use after OCR"
 (defun toc--cleanup-lines-roman-string ()
   "Delete all lines that contain only linefeeds and/or blanks and/or roman numerals."
   (interactive)
-  (beginning-of-buffer)
-  ;; (re-search-forward "^ *[ivx0-9\\.]+ *$" nil t)
-  ;; (replace-match "")
+  (goto-char (point-min))
   (while (not (eobp))
     (re-search-forward "^[\f ]*[ivx0-9\\.]* *$")
     (replace-match "")
@@ -188,7 +186,7 @@ Like `toc--cleanup-dots' but more suited for use after OCR"
 (defun toc-cleanup-blank-lines ()
   "Delete all empty lines."
   (interactive)
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (flush-lines "^ *$"))
 
 (defun toc--join-next-unnumbered-lines ()
@@ -205,7 +203,7 @@ Like `toc--cleanup-dots' but more suited for use after OCR"
 (defun toc--cleanup (startpage &optional arg)
   "Cleanup extracted Table Of Contents by running a series of cleanup functions."
   (interactive)
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (when (search-forward "contents" nil t)
     (replace-match (format "Contents %s" startpage)))
   (toc--cleanup-lines-contents-string)
@@ -240,10 +238,10 @@ ARG (\\[universal-argument]) to enter different separators."
                         (read-string
                          "Enter index separators as regexp (escape with \\ if required): ")
                       nil)))
-    (beginning-of-buffer)
+    (goto-char (point-min))
     (while (re-search-forward "^\\s-+" nil t)
       (replace-match ""))
-    (beginning-of-buffer)
+    (goto-char (point-min))
     (while (not (eobp))
       (let* ((level (toc--count-level-by-index separators)))
         (dotimes (x level) (insert " "))
@@ -364,22 +362,10 @@ unprocessed text."
         (end (match-end 0)))
     (- end start)))
 
-;; (defun toc-level ()
-;;   "Determine level of current line in TOC tree by comparing number of spaces with other lines in buffer."
-;;   (interactive)
-;;   (let (levels)
-;;     (beginning-of-buffer)
-;;     (while (not (eobp))
-;;       (let ((spaces (toc-count-leading-spaces)))
-;;         (unless (member spaces levels)
-;;           (setq levels (append levels (list spaces))))
-;;         (forward-line 1)))
-;;     (progn levels)))
-
 (defun toc--convert-to-tabulated-list ()
   "Parse and prepare content of current buffer for `toc-tabular-mode'."
   (interactive)
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (let (lines
         levels)
     (while (not (eobp))
@@ -552,7 +538,7 @@ unprocessed text."
 Displays results in a newlycreated buffer for use as source input
 to `pdfoutline' shell command."
   (interactive)
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (let ((source-buffer doc-buffer)
         text)
     (while (not (eobp))
@@ -575,7 +561,7 @@ to `pdfoutline' shell command."
                 ".txt"))))
     (with-current-buffer buff
       (insert "(bookmarks "))
-    (beginning-of-buffer)
+    (goto-char (point-min))
     (while (not (eobp))
       (let* ((v (tabulated-list-get-entry))
              (level-current (string-to-number (aref v 0)))
@@ -584,7 +570,6 @@ to `pdfoutline' shell command."
              (level-next (when v-next (string-to-number (aref v-next 0)))))
         (if level-next
             (with-current-buffer buff
-              ;; (end-of-buffer)
               (cond ((= level-next level-current)
                      (insert (format "(\"%s\" \"%s\") " (car sexp) (nth 1 sexp))))
                     ((> level-next level-current)
