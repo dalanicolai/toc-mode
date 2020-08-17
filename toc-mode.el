@@ -292,48 +292,60 @@ ARG (\\[universal-argument]) to enter different separators."
     (insert text)))
 
 ;;;###autoload
-(defun toc-extract-pages (startpage endpage arg)
+(defun toc-extract-pages (arg)
   "Extract text from text layer of current document and cleanup.
 Extract from STARTPAGE to ENDPAGE. Use with the universal
 ARG (\\[universal-argument]) omits cleanup to get the unprocessed
 text."
-  (interactive "nEnter start-pagenumber for extraction: \nnEnter end-pagenumber for extraction: \nP")
-  (toc--document-extract-pages-text startpage endpage)
-  (unless arg
-    (toc--cleanup startpage)))
+  (interactive "P")
+  (let ((mode (derived-mode-p 'pdf-view-mode 'djvu-read-mode)))
+    (if mode
+        (let* ((startpage (read-string "Enter start-pagenumber for extraction: "))
+               (endpage (read-string "Enter end-pagenumber for extraction: ")))
+          (toc--document-extract-pages-text startpage endpage)
+          (unless arg
+            (toc--cleanup startpage)))
+      (message "Buffer not in pdf-view- or djvu-read-mode"))))
+
 
 ;;;###autoload
-(defun toc-extract-pages-ocr (startpage endpage arg)
+(defun toc-extract-pages-ocr (arg)
   "Extract via OCR text of current document and cleanup.
 Extract from STARTPAGE to ENDPAGE. Use with the universal
 ARG (\\[universal-argument]) omits cleanup to get the
 unprocessed text."
-  (interactive "nEnter start-pagenumber for extraction: \nnEnter end-pagenumber for extraction: \nP")
-  (let* ((page startpage)
-         (source-buffer (current-buffer))
-         (ext (url-file-extension (buffer-file-name (current-buffer))))
-         (buffer (file-name-sans-extension (buffer-name))))
-    (while (<= page (+ endpage))
-      (let ((file (cond ((string= ".pdf" ext)
-                         (make-temp-file "pageimage"
-                                         nil
-                                         (number-to-string page)
-                                         (pdf-cache-get-image page 600)))
-                        ((string= ".djvu" ext)
-                         (djvu-goto-page page)
-                         (make-temp-file "pageimage"
-                                         nil
-                                         (number-to-string page)
-                                         (image-property djvu-doc-image :data))))))
-        (call-process "tesseract" nil (list buffer nil) nil file "stdout" "--psm" "6")
-        (setq page (1+ page))))
-    (switch-to-buffer buffer)
-    (toc-cleanup-mode) ;; required before setting local variable
-    (when (fboundp 'flyspell-mode)
-      (flyspell-mode))
-    (setq-local doc-buffer source-buffer)
-    (unless arg
-      (toc--cleanup startpage t))))
+  (interactive "P")
+  (let ((mode (derived-mode-p 'pdf-view-mode 'djvu-read-mode)))
+    (if mode
+        (let* ((page (string-to-number
+                      (read-string "Enter start-pagenumber for extraction: ")))
+               (endpage (string-to-number
+                         (read-string "Enter end-pagenumber for extraction: ")))
+               (source-buffer (current-buffer))
+               (ext (url-file-extension (buffer-file-name (current-buffer))))
+               (buffer (file-name-sans-extension (buffer-name))))
+          (while (<= page (+ endpage))
+            (let ((file (cond ((string= ".pdf" ext)
+                               (make-temp-file "pageimage"
+                                               nil
+                                               (number-to-string page)
+                                               (pdf-cache-get-image page 600)))
+                              ((string= ".djvu" ext)
+                               (djvu-goto-page page)
+                               (make-temp-file "pageimage"
+                                               nil
+                                               (number-to-string page)
+                                               (image-property djvu-doc-image :data))))))
+              (call-process "tesseract" nil (list buffer nil) nil file "stdout" "--psm" "6")
+              (setq page (1+ page))))
+          (switch-to-buffer buffer)
+          (toc-cleanup-mode) ;; required before setting local variable
+          (when (fboundp 'flyspell-mode)
+            (flyspell-mode))
+          (setq-local doc-buffer source-buffer)
+          (unless arg
+            (toc--cleanup page t)))
+      (message "Buffer not in pdf-view- or djvu-read-mode"))))
 
 ;;;###autoload
 (defun toc-extract-outline ()
@@ -514,8 +526,9 @@ unprocessed text."
     (define-key map [C-up] #'toc--scroll-pdf-other-window-up)
     (define-key map "\C-c\C-c" #'toc--tablist-to-toc-source)
     (define-key map "\C-c\C-c" #'toc--tablist-to-toc-source)
-    (define-key map "\S-j" #'evil-scroll-page-down)
-    (define-key map "\S-k" #'evil-scroll-page-up)
+    (when (featurep 'evil-commands)
+      (define-key map "\S-j" #'evil-scroll-page-down)
+      (define-key map "\S-k" #'evil-scroll-page-up))
     map))
 
 (define-derived-mode toc-tabular-mode
