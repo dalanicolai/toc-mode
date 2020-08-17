@@ -134,6 +134,23 @@
 ;;  ~C-down/C-up~      scroll document other window (if document buffer shown)
 ;;  ~S-down/S-up~      full page scroll document other window ( idem )
 
+(require 'pdf-tools nil t)
+(require 'djvu nil t)
+
+(defvar djvu-doc-image)
+(defvar doc-buffer)
+
+(declare-function pdf-cache-get-image "pdf-cache")
+(declare-function pdf-view-goto-page "pdf-view")
+(declare-function pdf-view-next-page "pdf-view")
+(declare-function pdf-view-previous-page "pdf-view")
+(declare-function pdf-view-scroll-up-or-next-page "pdf-view")
+(declare-function pdf-view-scroll-down-or-previous-page "pdf-view")
+(declare-function djvu-goto-page "djvu")
+(declare-function djvu-next-page "djvu")
+(declare-function djvu-prev-page "djvu")
+(declare-function djvu-scroll-up-or-next-page "djvu")
+(declare-function djvu-scroll-down-or-previous-page "djvu")
 
 (defgroup toc nil
   "Setting for the toc-mode package"
@@ -244,7 +261,7 @@ ARG (\\[universal-argument]) to enter different separators."
     (goto-char (point-min))
     (while (not (eobp))
       (let* ((level (toc--count-level-by-index separators)))
-        (dotimes (x level) (insert " "))
+        (dotimes (_x level) (insert " "))
         (forward-line 1)))))
 
 ;;; toc extract
@@ -292,7 +309,6 @@ unprocessed text."
   (let* ((page startpage)
          (source-buffer (current-buffer))
          (ext (url-file-extension (buffer-file-name (current-buffer))))
-         (text "")
          (buffer (file-name-sans-extension (buffer-name))))
     (while (<= page (+ endpage))
       (let ((file (cond ((string= ".pdf" ext)
@@ -581,7 +597,7 @@ to `pdfoutline' shell command."
                          (insert ")")
                          (setq level-diff (1- level-diff)))))))
           (forward-line))))
-    (previous-line)
+    (forward-line -1)
     (let ((v (tabulated-list-get-entry)))
           (switch-to-buffer buff)
           (insert (format " (\"%s\" \"#%s\"))" (aref v 1) (aref v 2)))
