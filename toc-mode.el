@@ -220,12 +220,19 @@ Like `toc--cleanup-dots' but more suited for use after OCR"
   (interactive)
   (re-search-forward "^[0-9\\.]*\\. " nil t))
 
-(defun toc--cleanup (startpage &optional arg)
-  "Cleanup extracted Table Of Contents by running a series of cleanup functions."
+(defun toc--cleanup (contents-page &optional arg)
+  "Cleanup extracted Table Of Contents by running a series of cleanup functions.
+It executes the following steps:
+1. insert a Contents entry with pagenumber CONTENTS-PAGE
+2. delete subsequent lines containing the string 'contents'
+3. tries to delete redundant dots
+4. deletes lines that containi only roman numerals and linefeed characters
+5. deletes
+When ARG is non-nil it skips the last three steps"
   (interactive)
   (goto-char (point-min))
   (when (search-forward "contents" nil t)
-    (replace-match (format "Contents %s" startpage)))
+    (replace-match (format "Contents %s" contents-page)))
   (toc--cleanup-lines-contents-string)
   (if arg
       (toc--cleanup-dots-ocr)
@@ -585,7 +592,7 @@ to `pdfoutline' shell command."
 
 ;;; djvu parse tablist to outline
 (defun toc--tablist-to-djvused ()
-  (interactive)
+  "Parse and prepare djvused outline source form tablist."
   (let ((source-buffer doc-buffer)
         (buff (get-buffer-create
                (concat
