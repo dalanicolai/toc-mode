@@ -617,7 +617,7 @@ to `pdfoutline' shell command."
                      (insert (format "(\"%s\" \"%s\")" (car sexp) (nth 1 sexp)))
                      (let ((level-diff (- level-current level-next)))
                        (while (> level-diff 0)
-                         (insert ")")
+                         (insert ") ")
                          (setq level-diff (1- level-diff)))))))
           (forward-line))))
     (forward-line -1)
@@ -632,7 +632,7 @@ to `pdfoutline' shell command."
   (interactive)
   (let ((ext (url-file-extension (buffer-file-name doc-buffer))))
     (cond ((string= ".pdf" ext) (toc--tablist-to-pdfoutline))
-          ((string= ".djvu" ext) (print "this is DJVU") (toc--tablist-to-djvused))
+          ((string= ".djvu" ext) (toc--tablist-to-djvused))
           (t (error "Buffer-source-file does not have pdf or djvu extension")))))
 
 
@@ -651,13 +651,18 @@ to `pdfoutline' shell command."
 (defun toc--add-to-djvu ()
   "Combine with add-toc-to-djvu in add-toc-to-document when ready."
   (interactive)
-  (save-buffer)
-  (shell-command (shell-command-to-string
+  (write-file (buffer-name (current-buffer)))
+  (print (format
+          "djvused -s -e \"set-outline '%s'\" %s"
+          (buffer-name)
+          (shell-quote-argument
+           (concat (file-name-sans-extension (buffer-name)) ".djvu"))))
+  (shell-command-to-string
                   (format
                    "djvused -s -e \"set-outline '%s'\" %s"
                    (buffer-name)
                    (shell-quote-argument
-                    (concat (file-name-sans-extension (buffer-name)) ".djvu"))))))
+                    (concat (file-name-sans-extension (buffer-name)) ".djvu")))))
 
 
 (defun toc--add-to-doc ()
