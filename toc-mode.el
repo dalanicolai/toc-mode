@@ -3,6 +3,7 @@
 ;; Copyright (C) 2020  Daniel Laurens Nicolai
 
 ;; Author: Daniel Laurens Nicolai <dalanicolai@gmail.com>
+;; Version: 0
 ;; Keywords: tools, outlines, convenience
 ;; Package-Requires: ((emacs "26.1"))
 ;; URL: https://github.com/dalanicolai/toc-mode
