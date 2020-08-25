@@ -639,7 +639,7 @@ to `pdfoutline' shell command."
 
 ;;;; add outline to document
 (defun toc--add-to-pdf ()
-  "Combine with add-toc-to-djvu in add-toc-to-document when ready."
+  "Use buffer contents as source for adding TOC to PDF using the shell program `pdfoutline'."
   (interactive)
   (save-buffer)
   (call-process "pdfoutline" nil "*pdfoutline*" nil
@@ -650,7 +650,7 @@ to `pdfoutline' shell command."
                   toc-destination-file-name)))
 
 (defun toc--add-to-djvu ()
-  "Combine with add-toc-to-djvu in add-toc-to-document when ready."
+  "Use buffer contents as source for adding TOC to DJVU using the shell program `djvused'."
   (interactive)
   (write-file (buffer-name (current-buffer)))
   (print (format
