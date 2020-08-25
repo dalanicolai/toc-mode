@@ -652,7 +652,7 @@ to `pdfoutline' shell command."
 (defun toc--add-to-djvu ()
   "Use buffer contents as source for adding TOC to DJVU using the shell program `djvused'."
   (interactive)
-  (write-file (buffer-name (current-buffer)))
+  (write-file default-directory)
   (print (format
           "djvused -s -e \"set-outline '%s'\" %s"
           (buffer-name)
