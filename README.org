@@ -136,3 +136,7 @@ toc-mode (tablist)
 * Alternatives
 For TOC extraction: [[https://pypi.org/project/document-contents-extractor/][documents-contents-extractor]]
 For adding TOC to document (pdf and djvu): [[http://handyoutlinerfo.sourceforge.net/][HandyOutliner]]
+
+[[https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6BHLS7H9ARJXE&source=url][DONATE]]
+
+
