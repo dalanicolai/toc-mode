@@ -56,6 +56,9 @@
 
 ;; TITLE (SOME) PAGENUMBER
 
+;; (If the initial TOC looks bad/unusable then try to use then universal
+;; argument C-u before extraction in the previous step and/or try the ocr option
+;; with or without the universal argument)
 ;; There can be any number of spaces between TITLE and PAGE. The correct
 ;; pagenumbers can be edited in the next step. A document outline supports
 ;; different levels and levels are automatically assigned in order of increasing
