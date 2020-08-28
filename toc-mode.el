@@ -48,11 +48,12 @@
 ;; text layer is bad, and answer the subsequent prompts by entering the
 ;; pagenumbers for the first and the last page each followed by RET. For PDF
 ;; extraction with OCR, currently it is required to view all contents pages once
-;; before extraction (toc-mode uses the cached file data). A buffer with the,
-;; somewhat cleaned up, extracted text will open in TOC-cleanup mode. Prefix
-;; command with the universal argument (C-u) to omit clean and get the raw text.
-;; 2. TOC-Cleanup In this mode you can further cleanup the contents to create a
-;; list where each line has the structure:
+;; before extraction (toc-mode uses the cached file data). Also the languages
+;; used for tesseract OCR can be customized via the `toc-ocr-languages'
+;; variable. A buffer with the, somewhat cleaned up, extracted text will open in
+;; TOC-cleanup mode. Prefix command with the universal argument (C-u) to omit
+;; clean and get the raw text. 2. TOC-Cleanup In this mode you can further
+;; cleanup the contents to create a list where each line has the structure:
 
 ;; TITLE (SOME) PAGENUMBER
 
@@ -167,6 +168,14 @@ For DJVU the old DJVU file is replaced by default"
   :type 'file
   :group 'toc)
 
+(defcustom toc-ocr-languages nil
+  "Languages used for extraction with ocr.
+Should be one or multiple language codes as recognized
+by tesseract -l flag, e.g. eng or eng+nld. Use
+\\[execute-extended-command] `toc-list-languages' to list the
+available languages."
+  :type 'string
+  :group 'toc)
 ;;;; toc-extract and cleanup
 
 ;;; toc-cleanup
@@ -311,6 +320,15 @@ text."
             (toc--cleanup startpage)))
       (message "Buffer not in pdf-view- or djvu-read-mode"))))
 
+(defun toc-list-languages ()
+  "List languages available for ocr.
+For use in `toc-ocr-languages'."
+  (interactive)
+  (let ((print-length nil))
+    (message (format "%s" (seq-subseq
+                         (split-string
+                          (shell-command-to-string "tesseract --list-langs"))
+                         5)))))
 
 ;;;###autoload
 (defun toc-extract-pages-ocr (arg)
@@ -327,7 +345,10 @@ unprocessed text."
                          (read-string "Enter end-pagenumber for extraction: ")))
                (source-buffer (current-buffer))
                (ext (url-file-extension (buffer-file-name (current-buffer))))
-               (buffer (file-name-sans-extension (buffer-name))))
+               (buffer (file-name-sans-extension (buffer-name)))
+               (args (list "stdout" "--psm" "6")))
+          (when toc-ocr-languages
+            (setq args (append args (list "-l" toc-ocr-languages))))
           (while (<= page (+ endpage))
             (let ((file (cond ((string= ".pdf" ext)
                                (make-temp-file "pageimage"
@@ -340,7 +361,9 @@ unprocessed text."
                                                nil
                                                (number-to-string page)
                                                (image-property djvu-doc-image :data))))))
-              (call-process "tesseract" nil (list buffer nil) nil file "stdout" "--psm" "6")
+              (apply 'call-process
+                     (append (list "tesseract" nil (list buffer nil) nil file)
+                             args))
               (setq page (1+ page))))
           (switch-to-buffer buffer)
           (toc-cleanup-mode) ;; required before setting local variable
