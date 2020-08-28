@@ -590,6 +590,7 @@ to `pdfoutline' shell command."
 ;;; djvu parse tablist to outline
 (defun toc--tablist-to-djvused ()
   "Parse and prepare djvused outline source form tablist."
+  (interactive)
   (let ((source-buffer doc-buffer)
         (buff (get-buffer-create
                (concat
@@ -607,11 +608,11 @@ to `pdfoutline' shell command."
         (if level-next
             (with-current-buffer buff
               (cond ((= level-next level-current)
-                     (insert (format "(\"%s\" \"%s\") " (car sexp) (nth 1 sexp))))
+                     (insert (format "(%s \"%s\") " (prin1-to-string (car sexp)) (nth 1 sexp))))
                     ((> level-next level-current)
-                     (insert (format "(\"%s\" \"%s\" " (car sexp) (nth 1 sexp))))
+                     (insert (format "(%s \"%s\" " (prin1-to-string (car sexp)) (nth 1 sexp))))
                     ((< level-next level-current)
-                     (insert (format "(\"%s\" \"%s\")" (car sexp) (nth 1 sexp)))
+                     (insert (format "(%s \"%s\")" (prin1-to-string (car sexp)) (nth 1 sexp)))
                      (let ((level-diff (- level-current level-next)))
                        (while (> level-diff 0)
                          (insert ") ")
