@@ -33,13 +33,6 @@
 ;; `pdfoutline' and `djvused' commands that are used to add the table of
 ;; contents to pdf- and djvu-files respectively.
 
-;; Important: For djvu documents, only outlines with maximum level deepness of 1
-;; are correctly parsed. For outlines with level deepness of 2 not all levels
-;; are set to correct level because the algorithm in the toc--parse-djvused
-;; function does not parse such files correctly yet (you are welcome to ‘repair’
-;; the algorithm to produce the correct syntax as it is described on the djvused
-;; website here).
-
 ;; Requirements: Currently the package requires the `pdftotext' (part of
 ;; poppler-utils), `pdfoutline' (part of fntsample) and `djvused' (part of
 ;; http://djvu.sourceforge.net/) command line utilities to be available.
