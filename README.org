@@ -1,6 +1,8 @@
 * toc-mode
-Create, cleanup, add and manage Table Of Contents (TOC) of pdf and djvu documents with Emacs
+[[https://melpa.org/#/toc-mode][file:https://melpa.org/packages/toc-mode-badge.svg]]
+[[https://www.gnu.org/licenses/gpl-3.0.en.html][https://img.shields.io/badge/license-GPLv3-blue.svg]]
 
+Create, cleanup, add and manage Table Of Contents (TOC) of pdf and djvu documents with Emacs
 * Introduction
 TOC-mode is a package for creating, cleaning, adding and managing the
 Table Of Contents (TOC) of pdf and djvu documents.
