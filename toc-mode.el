@@ -393,6 +393,40 @@ unprocessed text."
     (setq-local doc-buffer source-buffer)
     (insert text)))
 
+;;;###autoload
+(defun toc-extract-only ()
+  "Just extract text via OCR without further processing.
+Prompt for startpage and endpage and print OCR output to new buffer."
+  (interactive)
+  (let ((mode (derived-mode-p 'pdf-view-mode 'djvu-read-mode)))
+    (if mode
+        (let* ((page (string-to-number
+                      (read-string "Enter start-pagenumber for extraction: ")))
+               (endpage (string-to-number
+                         (read-string "Enter end-pagenumber for extraction: ")))
+               (ext (url-file-extension (buffer-file-name (current-buffer))))
+               (buffer (file-name-sans-extension (buffer-name)))
+               (args (list "stdout" "--psm" "6")))
+          (when toc-ocr-languages
+            (setq args (append args (list "-l" toc-ocr-languages))))
+          (while (<= page (+ endpage))
+            (let ((file (cond ((string= ".pdf" ext)
+                               (make-temp-file "pageimage"
+                                               nil
+                                               (number-to-string page)
+                                               (pdf-cache-get-image page 600)))
+                              ((string= ".djvu" ext)
+                               (djvu-goto-page page)
+                               (make-temp-file "pageimage"
+                                               nil
+                                               (number-to-string page)
+                                               (image-property djvu-doc-image :data))))))
+              (apply 'call-process
+                     (append (list "tesseract" nil (list buffer nil) nil file)
+                             args))
+              (setq page (1+ page))))
+          (switch-to-buffer buffer)))))
+
 (defun toc--create-tablist-buffer ()
   "Create tablist buffer, from cleaned up Table of Contents buffer, for easy page number adjustment."
   (interactive)
