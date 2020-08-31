@@ -63,6 +63,9 @@
 ;; `https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html' might be
 ;; useful.
 
+;; If you merely want to extract text without further processing then you can
+;; use the command `toc-extract-only'.
+
 ;; 2. TOC-Cleanup In this mode you can further cleanup the contents to create a
 ;; list where each line has the structure:
 

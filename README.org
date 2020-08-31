@@ -52,7 +52,14 @@ data). Also the languages used for tesseract OCR can be customized via the
 
 A buffer with the, somewhat cleaned up, extracted text will open in TOC-cleanup
 mode. Prefix command with the universal argument (=C-u=) to omit clean and get the
-raw text.
+raw text. If the extracted text is of too low quality you either can hack/extend
+the [[help:toc-extract-pages-ocr][toc-extract-pages-ocr]] definition, or alternatively you can try to extract
+the text with the [[https://pypi.org/project/document-contents-extractor/][python document-contents-extractor script]], which is more
+configurable (you are also welcome to hack on and improve that script).
+For this the [[https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html][tesseract]] documentation might be useful.
+
+If you merely want to extract text without further processing then you can
+use the command [[help:toc-extract-only][toc-extract-only]].
 
 ** 2. TOC-Cleanup
 In this mode you can further cleanup the contents to create a list where
