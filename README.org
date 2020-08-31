@@ -106,15 +106,27 @@ Type =C-c C-c= when done.
 
 ** 4. TOC-mode (add outline to document)
 The text of this buffer should have the right structure for adding the contents
-to (for pdf's a copy of) the original document. Final adjusments can be done but
+to (for pdf's a copy of) the original document. Final adjustments can be done but
 should not be necessary. Type =C-c C-c= for adding the contents to the
 document. 
 
-By default, the TOC is simply added to the original file. ONLY FOR PDF's, if the
-(customizable) variable ~toc-replace-original-file~ is ~nil~, then the TOC is added
+By default, the TOC is simply added to the original file. (ONLY FOR PDF's, if the
+(customizable) variable [[help:toc-replace-original-file][toc-replace-original-file]] is ~nil~, then the TOC is added
 to a copy of the original pdf file with the path as defined by the variable
 ~toc-destination-file-name~. Either a relative path to the original file
-directory or an absolute path can be given.
+directory or an absolute path can be given.)
+
+Sometimes the =pdfoutline/djvused= application is not able to add the TOC to the
+document. In that case you can either debug the problem by copying the used
+terminal command from the =*messages*= buffer and run it manually in the
+document's folder, or you can delete the outline source buffer and run
+=toc--tablist-to-handyoutliner= from the tablist buffer to get an outline source
+file that can be used with [[http://handyoutlinerfo.sourceforge.net/][HandyOutliner]] (unfortunately the handyoutliner
+command does not take arguments, but if you customize the [[help:toc-handyoutliner-path][toc-handyoutliner-path]]
+and [[help:toc-file-browser-command][toc-file-browser-command]] variables, then Emacs will try to open
+HandyOutliner and the file browser so that you can drag the files directly into
+HandyOutliner).
+
 
 
 * Key bindings
@@ -148,6 +160,3 @@ For adding TOC to document (pdf and djvu): [[http://handyoutlinerfo.sourceforge.
 # <input type="image" src="https://www.paypalobjects.com/en_US/NL/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
 # <img alt="" border="0" src="https://www.paypal.com/en_NL/i/scr/pixel.gif" width="1" height="1" />
 # </form>
-
-
-

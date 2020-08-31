@@ -44,16 +44,27 @@
 
 ;; 1. Extraction Open some pdf or djvu file in Emacs (pdf-tools and djvu package
 ;; recommended). Find the pagenumbers for the TOC. Then type M-x
-;; toc-extract-pages, or M-x toc-extract-pages-ocr if doc has no text layer or
-;; text layer is bad, and answer the subsequent prompts by entering the
+;; `toc-extract-pages', or M-x `toc-extract-pages-ocr' if doc has no text layer
+;; or text layer is bad, and answer the subsequent prompts by entering the
 ;; pagenumbers for the first and the last page each followed by RET. For PDF
 ;; extraction with OCR, currently it is required to view all contents pages once
 ;; before extraction (toc-mode uses the cached file data). Also the languages
 ;; used for tesseract OCR can be customized via the `toc-ocr-languages'
 ;; variable. A buffer with the, somewhat cleaned up, extracted text will open in
 ;; TOC-cleanup mode. Prefix command with the universal argument (C-u) to omit
-;; clean and get the raw text. 2. TOC-Cleanup In this mode you can further
-;; cleanup the contents to create a list where each line has the structure:
+;; clean and get the raw text. If the extracted text is of too low quality you
+;; either can hack/extend the `toc-extract-pages-ocr' definition, or
+;; alternatively you can try to extract the text with the python
+;; document-contents-extractor script (see URL
+;; `https://pypi.org/project/document-contents-extractor/'), which is more
+;; configurable (you are also welcome to hack and improve that script).
+
+;; The documentation at URL
+;; `https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html' might be
+;; useful.
+
+;; 2. TOC-Cleanup In this mode you can further cleanup the contents to create a
+;; list where each line has the structure:
 
 ;; TITLE (SOME) PAGENUMBER
 
@@ -114,7 +125,20 @@
 ;; added to a copy of the original pdf file with the path as defined by the
 ;; variable toc-destination-file-name. Either a relative path to the original
 ;; file directory or an absolute path can be given.
-;;; Code:
+
+;; Sometimes the `pdfoutline/djvused' application is not able to add the TOC to
+;; the document. In that case you can either debug the problem by copying the
+;; used terminal command from the `*messages*' buffer and run it manually in the
+;; document's folder, or you can delete the outline source buffer and run
+;; `toc--tablist-to-handyoutliner' from the tablist buffer to get an outline
+;; source file that can be used with HandyOutliner (see URL
+;; `http://handyoutlinerfo.sourceforge.net/') Unfortunately the handyoutliner
+;; command does not take arguments, but if you customize the
+;; `toc-handyoutliner-path' and `toc-file-browser-command' variables, then Emacs
+;; will try to open HandyOutliner and the file browser so that you can drag the
+;; files directly into HandyOutliner).
+
+;; Finally, if you just want to extract some text
 
 ;; Keybindings
 ;; all-modes (i.e. all steps)
@@ -132,10 +156,12 @@
 ;;  ~C-down/C-up~      scroll document other window (if document buffer shown)
 ;;  ~S-down/S-up~      full page scroll document other window ( idem )
 
+;;; Code:
 (require 'pdf-tools nil t)
 (require 'djvu nil t)
 (require 'evil nil t)
 
+;; List of declarations to eliminate byte-compile errors
 (defvar djvu-doc-image)
 (defvar doc-buffer)
 
@@ -153,6 +179,7 @@
 (declare-function evil-scroll-page-down "evil-commands")
 (declare-function evil-scroll-page-up "evil-commands")
 
+;;;; Customize definitions
 (defgroup toc nil
   "Setting for the toc-mode package"
   :group 'data)
@@ -176,6 +203,21 @@ by tesseract -l flag, e.g. eng or eng+nld. Use
 available languages."
   :type 'string
   :group 'toc)
+
+(defcustom toc-handyoutliner-path nil
+  "Path to handyoutliner executable.
+String (i.e. surround with double quotes). See
+URL`http://handyoutlinerfo.sourceforge.net/'."
+  :type 'file
+  :group 'toc)
+
+(defcustom toc-file-browser-command nil
+  "Command to open file browser.
+String (i.e. surround with double quotes)."
+  :type 'file
+  :group 'toc)
+
+
 ;;;; toc-extract and cleanup
 
 ;;; toc-cleanup
@@ -690,6 +732,41 @@ to `pdfoutline' shell command."
           ((string= ".djvu" ext) (toc--tablist-to-djvused))
           (t (error "Buffer-source-file does not have pdf or djvu extension")))))
 
+(defun toc--open-handy-outliner ()
+  (interactive)
+  (start-process ""
+                 nil
+                 toc-handyoutliner-path)
+  (let ((process-connection-type nil))
+    (start-process ""
+                   nil
+                   toc-file-browser-command
+                   (url-file-directory (buffer-file-name)))))
+
+;;; pdf parse tablist to
+(defun toc--tablist-to-handyoutliner ()
+  "Parse and prepare tablist-mode-buffer to source input.
+Displays results in a newlycreated buffer for use as source input
+to `pdfoutline' shell command."
+  (interactive)
+  (goto-char (point-min))
+  (let ((source-buffer (when (boundp 'doc-buffer) doc-buffer))
+        text)
+    (while (not (eobp))
+      (let* ((v (tabulated-list-get-entry))
+             (tabs (make-string (string-to-number (aref v 0)) ?\t)))
+        (setq text (concat text (format "%s %s %s\n" tabs (aref v 1) (aref v 2))))
+        (forward-line 1)))
+    (switch-to-buffer (find-file "contents.txt"))
+    (erase-buffer)
+    (toc-mode)
+    (when source-buffer
+      (setq-local doc-buffer source-buffer))
+    (insert text))
+  (save-buffer)
+  (when (and toc-handyoutliner-path toc-file-browser-command)
+    (toc--open-handy-outliner)))
+
 
 ;;;; add outline to document
 (defun toc--add-to-pdf ()
@@ -728,6 +805,7 @@ The text of the current buffer is passed as source input to either the
   (let ((ext (url-file-extension (buffer-file-name doc-buffer))))
     (cond ((string= ".pdf" ext) (toc--add-to-pdf))
           ((string= ".djvu" ext) (toc--add-to-djvu)))))
+
 
 (provide 'toc-mode)
 
