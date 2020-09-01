@@ -163,6 +163,7 @@
 (require 'pdf-tools nil t)
 (require 'djvu nil t)
 (require 'evil nil t)
+(require 'seq)
 
 ;; List of declarations to eliminate byte-compile errors
 (defvar djvu-doc-image)
@@ -515,7 +516,7 @@ Prompt for startpage and endpage and print OCR output to new buffer."
                lines
                (list (list nil
                            (vector
-                            (number-to-string (cl-position spaces levels))
+                            (number-to-string (seq-position levels spaces))
                             (mapconcat #'identity (butlast line-list) " ")
                             (mapconcat #'identity (last line-list) " "))))))
         (forward-line)))
@@ -739,7 +740,10 @@ to `pdfoutline' shell command."
   (interactive)
   (start-process ""
                  nil
-                 toc-handyoutliner-path)
+                 toc-handyoutliner-path))
+
+(defun toc--open-filepath-in-file-browser ()
+  (interactive)
   (let ((process-connection-type nil))
     (start-process ""
                    nil
@@ -768,7 +772,8 @@ to `pdfoutline' shell command."
     (insert text))
   (save-buffer)
   (when (and toc-handyoutliner-path toc-file-browser-command)
-    (toc--open-handy-outliner)))
+    (toc--open-handy-outliner)
+    (toc--open-filepath-in-file-browser)))
 
 
 ;;;; add outline to document

@@ -131,8 +131,8 @@ document's folder, or you can delete the outline source buffer and run
 file that can be used with [[http://handyoutlinerfo.sourceforge.net/][HandyOutliner]] (unfortunately the handyoutliner
 command does not take arguments, but if you customize the [[help:toc-handyoutliner-path][toc-handyoutliner-path]]
 and [[help:toc-file-browser-command][toc-file-browser-command]] variables, then Emacs will try to open
-HandyOutliner and the file browser so that you can drag the files directly into
-HandyOutliner).
+HandyOutliner and the file browser so that you can drag the file ~contents.txt~
+directly into HandyOutliner).
 
 
 
