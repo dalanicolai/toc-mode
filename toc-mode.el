@@ -164,6 +164,7 @@
 (require 'djvu nil t)
 (require 'evil nil t)
 (require 'seq)
+(require 'rst)
 
 ;; List of declarations to eliminate byte-compile errors
 (defvar djvu-doc-image)
@@ -260,6 +261,18 @@ Like `toc--cleanup-dots' but more suited for use after OCR"
   (interactive)
   (goto-char (point-min))
   (flush-lines "^ *$"))
+
+(defun toc--roman-to-arabic (count)
+  (interactive "p")
+  (dotimes (_x count) 
+    (move-end-of-line 1)
+    (let ((latin (number-to-string
+                  (rst-roman-to-arabic
+                   (thing-at-point 'word t)))))
+      (backward-word)
+      (kill-word 1)
+      (insert latin)
+      (forward-line))))
 
 (defun toc--join-next-unnumbered-lines ()
   "Search from point for first occurence of line not ending with Western numerals."
@@ -480,10 +493,16 @@ Prompt for startpage and endpage and print OCR output to new buffer."
 
 ;;;; toc major modes
 
+(define-key pdf-view-mode-map (kbd "C-c C-e") 'toc-extract-pages)
+(define-key djvu-read-mode-map (kbd "C-c C-e") 'toc-extract-pages)
+(define-key pdf-view-mode-map (kbd "C-c e") 'toc-extract-pages-ocr)
+(define-key djvu-read-mode-map (kbd "C-c e") 'toc-extract-pages-ocr)
+
 (defvar toc-cleanup-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-c\C-c" #'toc--create-tablist-buffer)
     (define-key map "\C-c\C-j" #'toc--join-next-unnumbered-lines)
+    (define-key map "\C-c\C-s" #'toc--roman-to-arabic)
     map))
 
 (define-derived-mode toc-cleanup-mode
