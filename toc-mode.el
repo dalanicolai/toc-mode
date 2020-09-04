@@ -398,10 +398,11 @@ unprocessed text."
   (interactive "P")
   (let ((mode (derived-mode-p 'pdf-view-mode 'djvu-read-mode)))
     (if mode
-        (let* ((page (string-to-number
-                      (read-string "Enter start-pagenumber for extraction: ")))
+        (let* ((startpage (string-to-number
+                           (read-string "Enter start-pagenumber for extraction: ")))
                (endpage (string-to-number
                          (read-string "Enter end-pagenumber for extraction: ")))
+               (page startpage)
                (source-buffer (current-buffer))
                (ext (url-file-extension (buffer-file-name (current-buffer))))
                (buffer (file-name-sans-extension (buffer-name)))
@@ -430,7 +431,7 @@ unprocessed text."
             (flyspell-mode))
           (setq-local doc-buffer source-buffer)
           (unless arg
-            (toc--cleanup page t)))
+            (toc--cleanup startpage t)))
       (message "Buffer not in pdf-view- or djvu-read-mode"))))
 
 ;;;###autoload
