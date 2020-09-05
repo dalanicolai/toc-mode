@@ -529,7 +529,7 @@ Prompt for startpage and endpage and print OCR output to new buffer."
                (endpage (string-to-number
                          (read-string "Enter end-pagenumber for extraction: ")))
                (ext (url-file-extension (buffer-file-name (current-buffer))))
-               (buffer (file-name-sans-extension (buffer-name)))
+               (buffer (concat (file-name-sans-extension (buffer-name)) ".txt"))
                (args (list "stdout" "--psm" "6")))
           (when toc-ocr-languages
             (setq args (append args (list "-l" toc-ocr-languages))))
