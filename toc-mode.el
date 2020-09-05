@@ -39,8 +39,19 @@
 ;; Extraction with OCR requires the tesseract command line utility to be
 ;; available.
 
-;; Usage: Extraction and adding contents to a document is done in 4 steps: 1
-;; extraction 2 cleanup 3 adjust/correct pagenumbers 4 add TOC to document
+;; Usage:
+
+;; In each step below, check out available shortcuts using C-h m. Additionally
+;; you can find available functions by typing the M-x mode-name (e.g. M-x
+;; toc-cleanup), or with two dashes in the mode name (e.g. M-x toc--cleanup). Of
+;; course if you use packages like Ivy or Helm you just use the fuzzy search
+;; functionality.
+
+;; Extraction and adding contents to a document is done in 4 steps:
+;; 1 extraction
+;; 2 cleanup
+;; 3 adjust/correct pagenumbers
+;; 4 add TOC to document
 
 ;; 1. Extraction Open some pdf or djvu file in Emacs (pdf-tools and djvu package
 ;; recommended). Find the pagenumbers for the TOC. Then type M-x
@@ -91,7 +102,7 @@
 ;; automatically to the next line not ending with a number and joins it with the
 ;; next line. If the indentation structure of the different lines does not
 ;; correspond with the levels, then the levels can be set automatically from the
-;; number of separatorss in the indices with M-x toc--cleanup-set-level-by-index.
+;; number of separatorss in the indices with M-x toc-cleanup-set-level-by-index.
 ;; The default separators is a . but a different separators can be entered by
 ;; preceding the function invocation with the universal argument (C-u). Some
 ;; documents contain a structure like
@@ -321,7 +332,7 @@ When ARG is non-nil it skips the last three steps"
          (string-list (split-string index sep t)))
     (length string-list)))
 
-(defun toc--cleanup-set-level-by-index (&optional arg)
+(defun toc-cleanup-set-level-by-index (&optional arg)
   "Automatic set indentation by number of separatorss in index.
 By default uses dots as separators. Prepend with universal
 ARG (\\[universal-argument]) to enter different separators."
@@ -494,10 +505,13 @@ Prompt for startpage and endpage and print OCR output to new buffer."
 
 ;;;; toc major modes
 
-(define-key pdf-view-mode-map (kbd "C-c C-e") 'toc-extract-pages)
-(define-key djvu-read-mode-map (kbd "C-c C-e") 'toc-extract-pages)
-(define-key pdf-view-mode-map (kbd "C-c e") 'toc-extract-pages-ocr)
-(define-key djvu-read-mode-map (kbd "C-c e") 'toc-extract-pages-ocr)
+(when (require 'pdf-tools nil t)
+  (define-key pdf-view-mode-map (kbd "C-c C-e") 'toc-extract-pages)
+  (define-key pdf-view-mode-map (kbd "C-c e") 'toc-extract-pages-ocr))
+
+(when (require 'djvu nil t)
+  (define-key djvu-read-mode-map (kbd "C-c C-e") 'toc-extract-pages)
+  (define-key djvu-read-mode-map (kbd "C-c e") 'toc-extract-pages-ocr))
 
 (defvar toc-cleanup-mode-map
   (let ((map (make-sparse-keymap)))

@@ -38,6 +38,11 @@ Extraction and adding contents to a document is done in 4 steps:
 3. adjust/correct pagenumbers
 4. add TOC to document
 
+In each step below, check out available shortcuts using =C-h m=. Additionally you
+can find available functions by typing the =M-x mode-name= (e.g. =M-x toc-cleanup=),
+or with two dashes in the mode name (e.g. =M-x toc--cleanup=). Of course if you
+use packages like Ivy or Helm you just use the fuzzy search functionality.
+
 ** 1. Extraction
 Open some pdf or djvu file in Emacs (pdf-tools and djvu package recommended).
 Find the pagenumbers for the TOC. Then type =M-x toc-extract-pages=, or =M-x
@@ -51,12 +56,12 @@ data). Also the languages used for tesseract OCR can be customized via the
 [[toc-mode-extract.gif]]
 
 A buffer with the, somewhat cleaned up, extracted text will open in TOC-cleanup
-mode. Prefix command with the universal argument (=C-u=) to omit clean and get the
-raw text. If the extracted text is of too low quality you either can hack/extend
-the [[help:toc-extract-pages-ocr][toc-extract-pages-ocr]] definition, or alternatively you can try to extract
-the text with the [[https://pypi.org/project/document-contents-extractor/][python document-contents-extractor script]], which is more
-configurable (you are also welcome to hack on and improve that script).
-For this the [[https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html][tesseract]] documentation might be useful.
+mode. Prefix command with the universal argument (=C-u=) to omit cleanup and get
+the raw text. If the extracted text is of too low quality you either can
+hack/extend the [[help:toc-extract-pages-ocr][toc-extract-pages-ocr]] definition, or alternatively you can try
+to extract the text with the [[https://pypi.org/project/document-contents-extractor/][python document-contents-extractor script]], which is
+more configurable (you are also welcome to hack on and improve that script). For
+this the [[https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html][tesseract]] documentation might be useful.
 
 If you merely want to extract text without further processing then you can
 use the command [[help:toc-extract-only][toc-extract-only]].
@@ -126,13 +131,13 @@ directory or an absolute path can be given.)
 Sometimes the =pdfoutline/djvused= application is not able to add the TOC to the
 document. In that case you can either debug the problem by copying the used
 terminal command from the =*messages*= buffer and run it manually in the
-document's folder, or you can delete the outline source buffer and run
-=toc--tablist-to-handyoutliner= from the tablist buffer to get an outline source
-file that can be used with [[http://handyoutlinerfo.sourceforge.net/][HandyOutliner]] (unfortunately the handyoutliner
-command does not take arguments, but if you customize the [[help:toc-handyoutliner-path][toc-handyoutliner-path]]
-and [[help:toc-file-browser-command][toc-file-browser-command]] variables, then Emacs will try to open
-HandyOutliner and the file browser so that you can drag the file ~contents.txt~
-directly into HandyOutliner).
+document's folder iside the terminal, or you can delete the outline source
+buffer and run =toc--tablist-to-handyoutliner= from the tablist buffer to get an
+outline source file that can be used with [[http://handyoutlinerfo.sourceforge.net/][HandyOutliner]] (unfortunately the
+handyoutliner command does not take arguments, but if you customize the
+[[help:toc-handyoutliner-path][toc-handyoutliner-path]] and [[help:toc-file-browser-command][toc-file-browser-command]] variables, then Emacs will
+try to open HandyOutliner and the file browser so that you can drag the file
+~contents.txt~ directly into HandyOutliner).
 
 
 
