@@ -27,13 +27,17 @@
 ;; toc-mode.el is a package to create and add a Table of Contents to pdf and
 ;; djvu documents. It implements features to extract a Table of Contents from
 ;; the textlayer of a document or via OCR if that last option is necessary or
-;; prefered. Subsequently this package implements various features to assist in
-;; tidy up the extracted Table of Contents, adjust the pagenumbers and finally
-;; parsing the Table of Contents into syntax that is understood by the
-;; `pdfoutline' and `djvused' commands that are used to add the table of
-;; contents to pdf- and djvu-files respectively.
+;; prefered. For 'software generated' PDFs it provides the option to use
+;; pdf.tocgen (see URL `https://krasjet.com/voice/pdf.tocgen/'). Subsequently
+;; this package implements various features to assist in tidy up the extracted
+;; Table of Contents, adjust the pagenumbers and finally parsing the Table of
+;; Contents into syntax that is understood by the `pdfoutline' and `djvused'
+;; commands that are used to add the table of contents to pdf- and djvu-files
+;; respectively.
 
-;; Requirements: Currently the package requires the `pdftotext' (part of
+;; Requirements: To use the pdf.tocgen functionality that software has to be
+;; installed (see URL `https://krasjet.com/voice/pdf.tocgen/'). For the other
+;; remaining functionality the package requires the `pdftotext' (part of
 ;; poppler-utils), `pdfoutline' (part of fntsample) and `djvused' (part of
 ;; http://djvu.sourceforge.net/) command line utilities to be available.
 ;; Extraction with OCR requires the tesseract command line utility to be
@@ -41,10 +45,18 @@
 
 ;; Usage:
 
-;; For 'software-generated' (i.e. PDF's not created from scans) PDF-files I
-;; recommend to use pdf.tocgen (see URL `https://krasjet.com/voice/pdf.tocgen/')
-;; instead of `toc-mode' (although the pdf.tocgen functionality might get
-;; integrated into =toc-mode= soon).
+;; For 'software-generated' (i.e. PDF's not created from scans) PDF-files it is
+;; recommend to use `toc-extract-with-pdf-tocgen'. To use this function you
+;; first have to provide the font properties for the different headline levels.
+;; For that select the word in a headline of a certain level and then type M-x
+;; `toc-gen-set-level'. This function will ask which level you are setting, the
+;; highest level should be level 1. After you have set the various levels (1,2,
+;; etc.) then it is time to run M-x `toc-extract-with-pdf-tocgen'. If a TOC is
+;; extracted succesfully, then in the pdftocgen-mode buffer simply press C-c C-c
+;; to add the contents to the PDF. The contents will be added to a copy of the
+;; original PDF with the filename output.pdf and this copy will be opened in a
+;; new buffer. If the pdf-tocgen option does not work well then continue with
+;; the steps below.
 
 ;; In each step below, check out available shortcuts using C-h m. Additionally
 ;; you can find available functions by typing the M-x mode-name (e.g. M-x
@@ -238,6 +250,42 @@ String (i.e. surround with double quotes)."
   :type 'file
   :group 'toc)
 
+;;;; pdf.tocgen
+(defun toc-gen-set-level (level)
+  (interactive "nWhich level you are setting (number): ")
+  (shell-command (format "pdfxmeta --auto %s --page %s '%s' \"%s\" >> recipe.toml"
+                         level
+                         (pdf-view-current-page)
+                         (url-filename (url-generic-parse-url buffer-file-name))
+                         (car (pdf-view-active-region-text)))))
+
+(defun toc-extract-with-pdf-tocgen ()
+  (interactive)
+  (let ((filename buffer-file-name)
+        (toc (shell-command-to-string
+              (format "pdftocgen '%s' < recipe.toml" buffer-file-name))))
+    (switch-to-buffer "toc")
+    (toc-pdftocgen-mode) ;; required before setting local variable
+    (when (fboundp 'flyspell-mode)
+      flyspell-mode)
+    (setq-local pdf-filename filename)
+    (insert toc)))
+
+(defun toc--pdftocgen-add-to-pdf ()
+  (interactive)
+  (write-file default-directory)
+  (shell-command (format "pdftocio -o output.pdf '%s' < toc" pdf-filename))
+  (find-file "output.pdf"))
+
+(defvar toc-pdftocgen-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-c\C-c" #'toc--pdftocgen-add-to-pdf)
+    map))
+
+(define-derived-mode toc-pdftocgen-mode
+  fundamental-mode "TOC-cleanup"
+  "Major mode for cleaning up Table Of Contents
+\\{toc-pdftocgen-mode-map}")
 
 ;;;; toc-extract and cleanup
 

@@ -23,18 +23,29 @@ For Spacemacs use the [[https://github.com/dalanicolai/toc-layer][toc-layer for 
 For regular Emacs users, well... you probably know how to install packages.
 
 ** Requirements
-Currently the package requires the ~pdftotext~ (part of poppler-utils), ~pdfoutline~
-(part of [[https://launchpad.net/ubuntu/bionic/+package/fntsample][fntsample]]) and ~djvused~ (part of [[http://djvu.sourceforge.net/][http://djvu.sourceforge.net/]]) command
-line utilities to be available. Extraction with OCR requires the ~tesseract~ command
+To use the pdf.tocgen functionality that software has to be installed (see
+[[https://krasjet.com/voice/pdf.tocgen/]]). For the other remaining functionality
+the package requires ~pdftotext~ (part of poppler-utils), ~pdfoutline~ (part of
+[[https://launchpad.net/ubuntu/bionic/+package/fntsample][fntsample]]) and ~djvused~ (part of [[http://djvu.sourceforge.net/][http://djvu.sourceforge.net/]]) command line
+utilities to be available. Extraction with OCR requires the ~tesseract~ command
 line utility to be available.
 
 
 
 
 * Usage
-For 'software-generated' (i.e. PDF's not created from scans) PDF-files I
-recommend to use [[https://krasjet.com/voice/pdf.tocgen/][pdf.tocgen]] instead of =toc-mode= (although the pdf.tocgen
-functionality might get integrated into =toc-mode= soon).
+For 'software-generated' (i.e. PDF's not created from scans) PDF-files it is
+recommend to use =toc-extract-with-pdf-tocgen=. To use this function you first
+have to provide the font properties for the different headline levels. For that
+select the word in a headline of a certain level and then type =M-x
+toc-gen-set-level=. This function will ask which level you are setting, the
+highest level should be level 1. After you have set the various levels (1,2,
+etc.) then it is time to run =M-x toc-extract-with-pdf-tocgen=. If a TOC is
+extracted succesfully, then in the pdftocgen-mode buffer simply press C-c C-c to
+add the contents to the PDF. The contents will be added to a copy of the
+original PDF with the filename output.pdf and this copy will be opened in a new
+buffer. If the pdf-tocgen option does not work well then continue with the steps
+below.
 
 In each step below, check out available shortcuts using =C-h m=. Additionally you
 can find available functions by typing the M-x mode-name (e.g. =M-x toc-cleanup=),
