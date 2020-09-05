@@ -197,6 +197,7 @@
 ;; List of declarations to eliminate byte-compile errors
 (defvar djvu-doc-image)
 (defvar doc-buffer)
+(defvar pdf-filename)
 
 (declare-function pdf-cache-get-image "pdf-cache")
 (declare-function pdf-view-goto-page "pdf-view")
@@ -251,7 +252,15 @@ String (i.e. surround with double quotes)."
   :group 'toc)
 
 ;;;; pdf.tocgen
+;;;###autoload
 (defun toc-gen-set-level (level)
+  "Define the text properties of the heading level.
+In a pdf-view buffer select a single word in the headline of a
+certain level. Then run `toc-gen-set-level' to write the text
+properties to the recipe.toml file that is created in the
+document's directory. You will be prompted to enter the LEVEL
+number. The highest level should have number 1, the next leve
+number 2 etc."
   (interactive "nWhich level you are setting (number): ")
   (shell-command (format "pdfxmeta --auto %s --page %s '%s' \"%s\" >> recipe.toml"
                          level
@@ -260,10 +269,16 @@ String (i.e. surround with double quotes)."
                          (car (pdf-view-active-region-text)))))
 
 (defun toc-extract-with-pdf-tocgen ()
+  "Extract Table of Contents with `pdf-tocgen'.
+Inserts the extracted TOC to a newly created buffer. This
+function requires `pdf.tocgen' to be installed (see URL
+`https://krasjet.com/voice/pdf.tocgen/'). The function can only
+be used after the headline text properties have been defined with
+the function `toc-gen-set-level'"
   (interactive)
   (let ((filename buffer-file-name)
         (toc (shell-command-to-string
-              (format "pdftocgen '%s' < recipe.toml" buffer-file-name))))
+              (format "pdftocgen %s < recipe.toml" (shell-quote-argument buffer-file-name)))))
     (switch-to-buffer "toc")
     (toc-pdftocgen-mode) ;; required before setting local variable
     (when (fboundp 'flyspell-mode)
@@ -272,6 +287,10 @@ String (i.e. surround with double quotes)."
     (insert toc)))
 
 (defun toc--pdftocgen-add-to-pdf ()
+  "Add content extracted with `pdf.tocgen' to copy of original PDF.
+The newly created PDF that includes the TOC is written to a file
+named output.pdf and opened in a new buffer. Don't forget to
+rename this new file."
   (interactive)
   (write-file default-directory)
   (shell-command (format "pdftocio -o output.pdf '%s' < toc" pdf-filename))
@@ -326,9 +345,12 @@ Like `toc--cleanup-dots' but more suited for use after OCR"
   (goto-char (point-min))
   (flush-lines "^ *$"))
 
-(defun toc--roman-to-arabic (count)
+(defun toc--roman-to-arabic (arg)
+  "Transform roman pagenumbers to hindu-arabic numberals.
+This function only works for lines that end with roman numerals.
+Prefix with numeric ARG prefix to apply to the next ARG lines."
   (interactive "p")
-  (dotimes (_x count) 
+  (dotimes (_x arg)
     (move-end-of-line 1)
     (let ((latin (number-to-string
                   (rst-roman-to-arabic
@@ -816,7 +838,8 @@ to `pdfoutline' shell command."
           (setq-local doc-buffer source-buffer))))
 
 (defun toc--tablist-to-toc-source ()
-  "Parse and prepare, from tablist-mode-buffer, a new buffer for use as source input to `pdfoutline' or `djvused' shell command."
+  "Parse and prepare, from tablist-mode-buffer, a new buffer for
+use as source input to `pdfoutline' or `djvused' shell command."
   (interactive)
   (let ((ext (url-file-extension (buffer-file-name doc-buffer))))
     (cond ((string= ".pdf" ext) (toc--tablist-to-pdfoutline))
@@ -824,12 +847,21 @@ to `pdfoutline' shell command."
           (t (error "Buffer-source-file does not have pdf or djvu extension")))))
 
 (defun toc--open-handy-outliner ()
+  "Open handyoutliner to add TOC to document.
+Prepare TOC using `toc--tablist-to-handyoutliner'. Requires the
+variabele `toc-handyoutliner-path' to be set to the correct
+path."
   (interactive)
   (start-process ""
                  nil
                  toc-handyoutliner-path))
 
 (defun toc--open-filepath-in-file-browser ()
+  "Open the buffer file directory in the file browser.
+When the variable `toc-file-browser-command' is set, this
+function is used by the `toc--tablist-to-handyoutliner' function
+so that the generated TOC can be easily added to the document
+with the handyoutliner software."
   (interactive)
   (let ((process-connection-type nil))
     (start-process ""
