@@ -41,6 +41,11 @@
 
 ;; Usage:
 
+;; For 'software-generated' (i.e. PDF's not created from scans) PDF-files I
+;; recommend to use pdf.tocgen (see URL `https://krasjet.com/voice/pdf.tocgen/')
+;; instead of `toc-mode' (although the pdf.tocgen functionality might get
+;; integrated into =toc-mode= soon).
+
 ;; In each step below, check out available shortcuts using C-h m. Additionally
 ;; you can find available functions by typing the M-x mode-name (e.g. M-x
 ;; toc-cleanup), or with two dashes in the mode name (e.g. M-x toc--cleanup). Of

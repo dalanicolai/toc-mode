@@ -32,6 +32,15 @@ line utility to be available.
 
 
 * Usage
+For 'software-generated' (i.e. PDF's not created from scans) PDF-files I
+recommend to use [[https://krasjet.com/voice/pdf.tocgen/][pdf.tocgen]] instead of =toc-mode= (although the pdf.tocgen
+functionality might get integrated into =toc-mode= soon).
+
+In each step below, check out available shortcuts using =C-h m=. Additionally you
+can find available functions by typing the M-x mode-name (e.g. =M-x toc-cleanup=),
+or with two dashes in the mode name (e.g. =M-x toc--cleanup=). Of course if you
+use packages like Ivy or Helm you just use the fuzzy search functionality.
+
 Extraction and adding contents to a document is done in 4 steps:
 1. extraction
 2. cleanup
