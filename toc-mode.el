@@ -284,7 +284,7 @@ number 2 etc."
           (insert "(try to select partial word)\n\n")
           (add-text-properties beg (point) '(face font-lock-warning-face)))
         (insert page-text)
-        (beginning-of-buffer)))))
+        (goto-char (point-min))))))
 
 
 (defun toc-extract-with-pdf-tocgen ()
