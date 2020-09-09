@@ -312,8 +312,15 @@ named output.pdf and opened in a new buffer. Don't forget to
 rename this new file."
   (interactive)
   (write-file default-directory)
-  (shell-command (format "pdftocio -o output.pdf '%s' < toc" pdf-filename))
-  (find-file "output.pdf"))
+  (let* ((message (shell-command-to-string (format "pdftocio '%s' < toc" pdf-filename))))
+    (kill-buffer-if-not-modified (find-file pdf-filename))
+    (when (file-exists-p (concat (file-name-base pdf-filename) "_out.pdf"))
+      (delete-file pdf-filename)
+      (rename-file (concat (file-name-base pdf-filename) "_out.pdf") pdf-filename))
+    (find-file pdf-filename)
+    (unless (string= message "")
+      (message (concat "The pdftocio command returned the following message: \n\n" message)))))
+
 
 (defvar toc-pdftocgen-mode-map
   (let ((map (make-sparse-keymap)))
