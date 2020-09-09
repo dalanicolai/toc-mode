@@ -127,9 +127,12 @@ keys will shift =down/up= all the page numbers from the current line and below
 
 The =TAB= key jumps to the pagenumber of the current line, while =C-right/C-left=
 will shift all remaining page numbers up/down while jumping/scrolling to the
-line its page in the document window. to the =S-up/S-donw= in the tablist window
-will just scroll page up/down in the document window and, only for pdf, =C-up/C-down=
-will scroll smoothly in that window.
+line its page in the document window. Because the numbering of scanned books
+often breaks at sections of a certain level, =C-j= will let jo jump quickly to the
+next entry of a certain level (e.g. you can quickly check if the page numbers of
+all level 0 sections correspond to the page numbers in the document). The
+=S-up/S-down= in the tablist window will just scroll page up/down in the document
+window and, =C-up/C-down= will scroll smoothly in that window.
 
 Type =C-c C-c= when done.
 
@@ -174,6 +177,7 @@ toc-mode (tablist)
 | ~S-right/S-left~ | in/decrease pagenumber current entry                                 |
 | ~C-down/C-up~    | scroll document other window (only when other buffer shows document) |
 | ~S-down/S-up~    | full page scroll document other window ( idem )                      |
+| =C-j=            | toc--jump-to-next-entry-by-level                                                                     |
 
 
 * Alternatives

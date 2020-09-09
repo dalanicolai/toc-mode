@@ -753,6 +753,14 @@ Prompt for startpage and endpage and print OCR output to new buffer."
           ((string= ".djvu" ext) (djvu-scroll-down-or-previous-page))))
   (other-window 1))
 
+(defun toc--jump-to-next-entry-by-level (char)
+  (interactive "cJump to next entry of level: ")
+  (forward-line)
+  (let ((level (char-to-string char)))
+    (while (not (or (string= (aref (tabulated-list-get-entry) 0) level) (eobp)))
+                (forward-line)))
+  (toc--tablist-follow))
+
 (defvar toc-tabular-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map [right] #'toc--increase-remaining)
@@ -766,6 +774,7 @@ Prompt for startpage and endpage and print OCR output to new buffer."
     (define-key map [S-up] #'toc--scroll-other-window-page-down)
     (define-key map [C-down] #'toc--scroll-pdf-other-window-down)
     (define-key map [C-up] #'toc--scroll-pdf-other-window-up)
+    (define-key map "\C-j" #'toc--jump-to-next-entry-by-level)
     (define-key map "\C-c\C-c" #'toc--tablist-to-toc-source)
     (define-key map "\C-c\C-c" #'toc--tablist-to-toc-source)
     (when (featurep 'evil-commands)
