@@ -36,8 +36,8 @@
 ;; respectively.
 
 ;; Requirements: To use the pdf.tocgen functionality that software has to be
-;; installed (see URL `https://krasjet.com/voice/pdf.tocgen/'). For the other
-;; remaining functionality the package requires the `pdftotext' (part of
+;; installed (see URL `https://krasjet.com/voice/pdf.tocgen/'). For the
+;; remaining functions the package requires the `pdftotext' (part of
 ;; poppler-utils), `pdfoutline' (part of fntsample) and `djvused' (part of
 ;; http://djvu.sourceforge.net/) command line utilities to be available.
 ;; Extraction with OCR requires the tesseract command line utility to be
@@ -262,11 +262,30 @@ document's directory. You will be prompted to enter the LEVEL
 number. The highest level should have number 1, the next leve
 number 2 etc."
   (interactive "nWhich level you are setting (number): ")
-  (shell-command (format "pdfxmeta --auto %s --page %s '%s' \"%s\" >> recipe.toml"
-                         level
-                         (pdf-view-current-page)
-                         (url-filename (url-generic-parse-url buffer-file-name))
-                         (car (pdf-view-active-region-text)))))
+  (let* ((page (pdf-view-current-page))
+         (filename (url-filename (url-generic-parse-url buffer-file-name)))
+         (pdfxmeta-result (shell-command
+                           (format "pdfxmeta --auto %s --page %s '%s' \"%s\" >> recipe.toml"
+                                   level
+                                   page
+                                   filename
+                                   (car (pdf-view-active-region-text))))))
+    (when (eq pdfxmeta-result 1)
+      (let ((page-text (shell-command-to-string
+                        (format "mutool draw -F text '%s' %s"
+                                filename
+                                page
+                                ))))
+        (pop-to-buffer "page-text")
+        (insert
+         "COULD NOT SET HEADING LEVEL. MUPDF EXTRACTED FOLLOWING PAGE TEXT FROM PAGE:\n")
+        (add-text-properties 1 (point) '(face font-lock-warning-face))
+        (let ((beg (point)))
+          (insert "(try to select partial word)\n\n")
+          (add-text-properties beg (point) '(face font-lock-warning-face)))
+        (insert page-text)
+        (beginning-of-buffer)))))
+
 
 (defun toc-extract-with-pdf-tocgen ()
   "Extract Table of Contents with `pdf-tocgen'.

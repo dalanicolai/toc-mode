@@ -166,10 +166,11 @@ all-modes (i.e. all steps)
 | ~C-c C-c~     | dispatch (next step) |
 toc-cleanup-mode
 | ~C-c C-j~ | toc-join-next-unnumbered-lines |
+| =C-c C-s= | toc--roman-to-arabic           |
 toc-mode (tablist)
 | ~TAB~            | preview/jump-to-page                                                 |
 | ~right/left~     | toc-in/decrease-remaining                                            |
-| ~C-right/C-left~ | toc-in/decrease-remaining and view page                           |
+| ~C-right/C-left~ | toc-in/decrease-remaining and view page                              |
 | ~S-right/S-left~ | in/decrease pagenumber current entry                                 |
 | ~C-down/C-up~    | scroll document other window (only when other buffer shows document) |
 | ~S-down/S-up~    | full page scroll document other window ( idem )                      |
