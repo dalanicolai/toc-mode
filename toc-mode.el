@@ -44,18 +44,6 @@
 
 ;; Usage:
 
-;; For 'software-generated' (i.e. PDF's not created from scans) PDF-files it is
-;; recommend to use `toc-extract-with-pdf-tocgen'. To use this function you
-;; first have to provide the font properties for the different headline levels.
-;; For that select the word in a headline of a certain level and then type M-x
-;; `toc-gen-set-level'. This function will ask which level you are setting, the
-;; highest level should be level 1. After you have set the various levels (1,2,
-;; etc.) then it is time to run M-x `toc-extract-with-pdf-tocgen'. If a TOC is
-;; extracted succesfully, then in the pdftocgen-mode buffer simply press C-c C-c
-;; to add the contents to the PDF. The contents will be added to a copy of the
-;; original PDF with the filename output.pdf and this copy will be opened in a
-;; new buffer. If the pdf-tocgen option does not work well then continue with
-;; the steps below.
 
 ;; In each step below, check out available shortcuts using C-h m. Additionally
 ;; you can find available functions by typing the M-x mode-name (e.g. M-x
@@ -69,26 +57,44 @@
 ;; 3 adjust/correct pagenumbers
 ;; 4 add TOC to document
 
-;; 1. Extraction Open some pdf or djvu file in Emacs (pdf-tools and djvu package
-;; recommended). Find the pagenumbers for the TOC. Then type M-x
-;; `toc-extract-pages', or M-x `toc-extract-pages-ocr' if doc has no text layer
-;; or text layer is bad, and answer the subsequent prompts by entering the
-;; pagenumbers for the first and the last page each followed by RET. For PDF
-;; extraction with OCR, currently it is required to view all contents pages once
-;; before extraction (toc-mode uses the cached file data). Also the languages
-;; used for tesseract OCR can be customized via the `toc-ocr-languages'
-;; variable. A buffer with the, somewhat cleaned up, extracted text will open in
-;; TOC-cleanup mode. Prefix command with the universal argument (C-u) to omit
-;; clean and get the raw text. If the extracted text is of too low quality you
-;; either can hack/extend the `toc-extract-pages-ocr' definition, or
-;; alternatively you can try to extract the text with the python
-;; document-contents-extractor script (see URL
+;; 1. Extraction For PDFs without TOC pages, with a very complicated TOC (i.e.
+;; that require much cleanup work) or with headlines well fitted for automatic
+;; extraction (you will have to decide for yourself by trying it) consider to
+;; use the pdf.tocgen (URL `https://krasjet.com/voice/pdf.tocgen/')
+;; functionality described below. Otherwise, start with opening some pdf or djvu
+;; file in Emacs (pdf-tools and djvu package recommended). Find the pagenumbers
+;; for the TOC. Then type M-x `toc-extract-pages', or M-x
+;; `toc-extract-pages-ocr' if doc has no text layer or text layer is bad, and
+;; answer the subsequent prompts by entering the pagenumbers for the first and
+;; the last page each followed by RET. For PDF extraction with OCR, currently it
+;; is required to view all contents pages once before extraction (toc-mode uses
+;; the cached file data). Also the languages used for tesseract OCR can be
+;; customized via the `toc-ocr-languages' variable. A buffer with the, somewhat
+;; cleaned up, extracted text will open in TOC-cleanup mode. Prefix command with
+;; the universal argument (C-u) to omit clean and get the raw text. If the
+;; extracted text is of too low quality you either can hack/extend the
+;; `toc-extract-pages-ocr' definition, or alternatively you can try to extract
+;; the text with the python document-contents-extractor script (see URL
 ;; `https://pypi.org/project/document-contents-extractor/'), which is more
 ;; configurable (you are also welcome to hack and improve that script).
 
 ;; The documentation at URL
 ;; `https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html' might be
 ;; useful.
+
+;; Software-generated PDF's with pdf.tocgen
+;; For 'software-generated' (i.e. PDF's not created from scans) PDF-files it is
+;; sometimes easier to use `toc-extract-with-pdf-tocgen'. To use this function
+;; you first have to provide the font properties for the different headline
+;; levels. For that select the word in a headline of a certain level and then
+;; type M-x `toc-gen-set-level'. This function will ask which level you are
+;; setting, the highest level should be level 1. After you have set the various
+;; levels (1,2, etc.) then it is time to run M-x `toc-extract-with-pdf-tocgen'.
+;; If a TOC is extracted succesfully, then in the pdftocgen-mode buffer simply
+;; press C-c C-c to add the contents to the PDF. The contents will be added to a
+;; copy of the original PDF with the filename output.pdf and this copy will be
+;; opened in a new buffer. If the pdf-tocgen option does not work well then
+;; continue with the steps below.
 
 ;; If you merely want to extract text without further processing then you can
 ;; use the command `toc-extract-only'.
