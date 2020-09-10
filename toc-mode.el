@@ -1,5 +1,4 @@
 ;;; toc-mode.el --- Manage outlines of pdf and djvu document  -*- lexical-binding: t; -*-
-
 ;; Copyright (C) 2020  Daniel Laurens Nicolai
 
 ;; Author: Daniel Laurens Nicolai <dalanicolai@gmail.com>
@@ -173,19 +172,21 @@
 
 ;; Keybindings
 ;; all-modes (i.e. all steps)
-;;  Key Binding        Description
-;;   ~C-c C-c~         dispatch (next step)
+;;  Key Binding       Description
+;;  C-c C-c           dispatch (next step)
 
 ;; toc-cleanup-mode
-;;  ~C-c C-j~          toc--join-next-unnumbered-lines
+;; C-c C-j            toc--join-next-unnumbered-lines
+;; C-c C-s            toc--roman-to-arabic
 
 ;; toc-mode (tablist)
-;;  ~TAB~              preview/jump-to-page
-;;  ~right/left~       toc-in/decrease-remaining
-;;  ~C-right/C-left~   toc-in/decrease-remaining and view page
-;;  ~S-right/S-left~   in/decrease pagenumber current entry
-;;  ~C-down/C-up~      scroll document other window (if document buffer shown)
-;;  ~S-down/S-up~      full page scroll document other window ( idem )
+;; TAB~               preview/jump-to-page
+;; right/left         toc-in/decrease-remaining
+;; C-right/C-left     toc-in/decrease-remaining and view page
+;; S-right/S-left     in/decrease pagenumber current entry
+;; C-down/C-up        scroll document other window (if document buffer shown)
+;; S-down/S-up        full page scroll document other window ( idem )
+;; C-j                toc--jump-to-next-entry-by-level
 
 ;;; Code:
 (require 'pdf-tools nil t)
@@ -754,6 +755,7 @@ Prompt for startpage and endpage and print OCR output to new buffer."
   (other-window 1))
 
 (defun toc--jump-to-next-entry-by-level (char)
+  "Jump to the next entry of level CHAR."
   (interactive "cJump to next entry of level: ")
   (forward-line)
   (let ((level (char-to-string char)))
@@ -873,8 +875,10 @@ to `pdfoutline' shell command."
           (setq-local doc-buffer source-buffer))))
 
 (defun toc--tablist-to-toc-source ()
-  "Parse and prepare, from tablist-mode-buffer, a new buffer for
-use as source input to `pdfoutline' or `djvused' shell command."
+  "Parse and prepare source file.
+From tablist-mode-buffer, parse code and create source in new
+buffer to use as input for `pdfoutline' or `djvused' shell
+command."
   (interactive)
   (let ((ext (url-file-extension (buffer-file-name doc-buffer))))
     (cond ((string= ".pdf" ext) (toc--tablist-to-pdfoutline))
