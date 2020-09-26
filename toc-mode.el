@@ -269,7 +269,7 @@ document's directory. You will be prompted to enter the LEVEL
 number. The highest level should have number 1, the next leve
 number 2 etc."
   (interactive "nWhich level you are setting (number): ")
-  (let* ((page (pdf-view-current-page))
+  (let* ((page (eval (pdf-view-current-page)))
          (filename (url-filename (url-generic-parse-url buffer-file-name)))
          (pdfxmeta-result (shell-command
                            (format "pdfxmeta --auto %s --page %s '%s' \"%s\" >> recipe.toml"
@@ -978,6 +978,33 @@ The text of the current buffer is passed as source input to either the
     (cond ((string= ".pdf" ext) (toc--add-to-pdf))
           ((string= ".djvu" ext) (toc--add-to-djvu)))))
 
+(defun toc--source-to-handyoutliner ()
+  " "
+  (interactive)
+  (goto-char (point-min))
+  (while (not (eobp))
+    (let ((num (thing-at-point 'number)))
+      (delete-char 2)
+      (dotimes (_x num) (insert "\t"))
+      (re-search-forward "[0-9]+")
+      (let ((page (match-string 0)))
+        (replace-match "")
+        (delete-char 1)
+        (move-end-of-line 1)
+        (insert " ")
+        (insert page)
+      (forward-line)))
+    ))
+  ;; (goto-char (point-min))
+  ;; (while (not (eobp))
+  ;;   (re-search-forward "[0-9]+")
+  ;;   (let ((page (match-string 0)))
+  ;;     (replace-match "")
+  ;;     (delete-char 1)
+  ;;     (move-end-of-line 1)
+  ;;     (insert " ")
+  ;;     (insert page)
+  ;;     (forward-line))))
 
 (provide 'toc-mode)
 
