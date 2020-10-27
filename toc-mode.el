@@ -702,6 +702,18 @@ Prompt for startpage and endpage and print OCR output to new buffer."
        t)
       (forward-line 1))))
 
+(defun toc--replace-input ()
+  (interactive)
+  (let* ((column (cond ((< (current-column) 5)
+                       0)
+                      ((and (> (current-column) 5) (< (current-column) 90))
+                       1)
+                      ((> (current-column) 90)
+                       2)))
+         (old-input (aref (tabulated-list-get-entry) column))
+         (new-input (read-string "Replace column input with: " old-input)))
+    (tabulated-list-set-col column new-input t)))
+
 (defun toc--tablist-follow ()
   "Preview pagenumber of current line in separate document buffer."
   (interactive)
@@ -777,6 +789,7 @@ Prompt for startpage and endpage and print OCR output to new buffer."
     (define-key map [S-left] #'toc--decrease)
     (define-key map [C-right] #'toc--increase-remaining-and-follow)
     (define-key map [C-left] #'toc--decrease-remaining-and-follow)
+    (define-key map "\C-r" #'toc--replace-input)
     (define-key map [tab] #'toc--tablist-follow)
     (define-key map [S-down] #'toc--scroll-other-window-page-up)
     (define-key map [S-up] #'toc--scroll-other-window-page-down)
@@ -794,7 +807,7 @@ Prompt for startpage and endpage and print OCR output to new buffer."
   tabulated-list-mode "TOC-tabular"
   "Major mode for Table Of Contents.
 \\{toc-tabular-mode-map}"
-  (setq-local tabulated-list-format [("level" 10 nil) ("name" 80 nil) ("page" 1 nil)])
+  (setq-local tabulated-list-format [("level" 5 nil) ("name" 84 nil) ("page" 4 nil)])
   (tabulated-list-init-header))
 
 (defun toc--list (buffer)
