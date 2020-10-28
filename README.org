@@ -68,12 +68,17 @@ the [[https://krasjet.com/voice/pdf.tocgen/][pdf.tocgen]] functionality describe
 
 Otherwise, start with opening some pdf or djvu file in Emacs (pdf-tools and djvu
 package recommended). Find the pagenumbers for the TOC. Then type =M-x
-toc-extract-pages=, or =M-x toc-extract-pages-ocr= if doc has no text layer or text
-layer is bad, and answer the subsequent prompts by entering the pagenumbers for
-the first and the last page each followed by =RET=. *For PDF extraction with OCR,
-currently it is required* *to view all contents pages once before extraction*
-(toc-mode uses the cached file data). Also the languages used for tesseract OCR
-can be customized via the ~toc-ocr-languages~ variable.
+toc-extract-pages=, or =M-x toc-extract-pages-ocr= if doc has no text layer or
+the text layer is bad, and answer the subsequent prompts by entering the
+pagenumbers for the first and the last page each followed by =RET=. *For PDF
+extraction with OCR, currently it is required* *to view all contents pages once
+before extraction* (toc-mode uses the cached file data). For TOC's that are
+formatted as two columns per page, prepend the =toc-extract-pages-ocr= command
+with two universal arguments. Then after you are asked for the start and finish
+pagenumbers, a third question asks you to set the tesseract psm code. For the
+double column layout it is best (as far as I know) to use psm code =1=. Also the
+languages used for tesseract OCR can be customized via the ~toc-ocr-languages~
+variable.
 
 [[toc-mode-extract.gif]]
 
@@ -153,6 +158,9 @@ all level 0 sections correspond to the page numbers in the document). The
 =S-up/S-down= in the tablist window will just scroll page up/down in the document
 window and, =C-up/C-down= will scroll smoothly in that window.
 
+If you discover some small error in some field, then you put the cursor on that
+field and press =C-r= to correct the text in that field.
+
 Type =C-c C-c= when done.
 
 ** 4. TOC-mode (add outline to document)
@@ -196,7 +204,8 @@ toc-mode (tablist)
 | ~S-right/S-left~ | in/decrease pagenumber current entry                                 |
 | ~C-down/C-up~    | scroll document other window (only when other buffer shows document) |
 | ~S-down/S-up~    | full page scroll document other window ( idem )                      |
-| =C-j=            | toc--jump-to-next-entry-by-level                                                                     |
+| =C-j=            | toc--jump-to-next-entry-by-level                                     |
+| =C-r=            | toc--replace-input                                                   |
 
 
 * Alternatives
@@ -204,7 +213,6 @@ toc-mode (tablist)
 - For adding TOC to document (pdf and djvu): [[http://handyoutlinerfo.sourceforge.net/][HandyOutliner]]
 
 *** Donate
-
 [[https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6BHLS7H9ARJXE&source=url][Buy me a coffee (PayPal donate)]]
 
 # <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">

@@ -82,6 +82,12 @@
 ;; `https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html' might be
 ;; useful.
 
+;; For TOC's that are formatted as two columns per page, prepend the
+;; `toc-extract-pages-ocr' command with two universal arguments. Then after you
+;; are asked for the start and finish pagenumbers, a third question asks you to
+;; set the tesseract psm code. For the double column layout it is best (as far
+;; as I know) to use psm code '1'.
+
 ;; Software-generated PDF's with pdf.tocgen
 ;; For 'software-generated' (i.e. PDF's not created from scans) PDF-files it is
 ;; sometimes easier to use `toc-extract-with-pdf-tocgen'. To use this function
@@ -352,6 +358,7 @@ rename this new file."
     (forward-line 1)))
 
 (defun toc--cleanup-dots-ocr ()
+  (interactive)
   "Remove dots between heading its title and page number.
 Like `toc--cleanup-dots' but more suited for use after OCR"
   (goto-char (point-min))
@@ -514,7 +521,7 @@ For use in `toc-ocr-languages'."
 Extract from STARTPAGE to ENDPAGE. Use with the universal
 ARG (\\[universal-argument]) omits cleanup to get the
 unprocessed text."
-  (interactive "P")
+  (interactive "p")
   (let ((mode (derived-mode-p 'pdf-view-mode 'djvu-read-mode)))
     (if mode
         (let* ((startpage (string-to-number
@@ -525,7 +532,10 @@ unprocessed text."
                (source-buffer (current-buffer))
                (ext (url-file-extension (buffer-file-name (current-buffer))))
                (buffer (file-name-sans-extension (buffer-name)))
-               (args (list "stdout" "--psm" "6")))
+               (psm (if (= arg 16)
+                        (read-string "Enter code (interger) for tesseract psm: ")
+                      "6"))
+               (args (list "stdout" "--psm" psm)))
           (when toc-ocr-languages
             (setq args (append args (list "-l" toc-ocr-languages))))
           (while (<= page (+ endpage))
@@ -549,7 +559,7 @@ unprocessed text."
           (when (fboundp 'flyspell-mode)
             (flyspell-mode))
           (setq-local doc-buffer source-buffer)
-          (unless arg
+          (unless (or (= arg 4) (= arg 16))
             (toc--cleanup startpage t)))
       (message "Buffer not in pdf-view- or djvu-read-mode"))))
 
