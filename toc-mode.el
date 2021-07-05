@@ -1,4 +1,4 @@
-;;; toc-mode.el --- Manage outlines of pdf and djvu document  -*- lexical-binding: t; -*-
+;;; toc-mode.el --- Manage outlines/table of contents of pdf and djvu documents  -*- lexical-binding: t; -*-
 ;; Copyright (C) 2020  Daniel Laurens Nicolai
 
 ;; Author: Daniel Laurens Nicolai <dalanicolai@gmail.com>
