@@ -949,7 +949,7 @@ to `pdfoutline' shell command."
     (while (not (eobp))
       (let* ((v (tabulated-list-get-entry))
              (tabs (make-string (string-to-number (aref v 0)) ?\t)))
-        (setq text (concat text (format "%s %s %s\n" tabs (aref v 1) (aref v 2))))
+        (setq text (concat text (format "%s%s %s\n" tabs (aref v 1) (aref v 2))))
         (forward-line 1)))
     (switch-to-buffer (find-file "contents.txt"))
     (erase-buffer)
@@ -958,7 +958,8 @@ to `pdfoutline' shell command."
       (setq-local doc-buffer source-buffer))
     (insert text))
   (save-buffer)
-  (when (and toc-handyoutliner-path toc-file-browser-command)
+  (if (not (and toc-handyoutliner-path toc-file-browser-command))
+      (message "Path to handyoutliner or file browser command not defined")
     (toc--open-handy-outliner)
     (toc--open-filepath-in-file-browser)))
 
