@@ -545,11 +545,19 @@ unprocessed text."
                                                (number-to-string page)
                                                (pdf-cache-get-image page 600)))
                               ((string= ".djvu" ext)
-                               (djvu-goto-page page)
-                               (make-temp-file "pageimage"
-                                               nil
-                                               (number-to-string page)
-                                               (image-property djvu-doc-image :data))))))
+                               ;; new code for djvu3
+                               (let ((outfile (format "/tmp/pageimagep%s" page)))
+                                 (shell-command (format "ddjvu -page=%s '%s' %s"
+                                                        page
+                                                        buffer-file-name
+                                                        outfile))
+                                 outfile)))))
+              ;; old code for original djvu.el
+              ;; (djvu-goto-page page)
+              ;; (make-temp-file "pageimage"
+              ;;                 nil
+              ;;                 (number-to-string page)
+              ;;                 (image-property djvu-doc-image :data))))))
               (apply 'call-process
                      (append (list "tesseract" nil (list buffer nil) nil file)
                              args))
