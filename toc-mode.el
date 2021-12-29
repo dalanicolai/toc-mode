@@ -201,7 +201,8 @@
 ;; C-j                toc--jump-to-next-entry-by-level
 
 ;;; Code:
-(require 'pdf-tools nil t)
+(eval-when-compile
+  (require 'pdf-tools nil t))
 (require 'djvu nil t)
 (require 'evil nil t)
 (require 'seq)
