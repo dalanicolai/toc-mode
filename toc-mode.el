@@ -359,9 +359,9 @@ rename this new file."
     (forward-line 1)))
 
 (defun toc--cleanup-dots-ocr ()
-  (interactive)
   "Remove dots between heading its title and page number.
 Like `toc--cleanup-dots' but more suited for use after OCR"
+  (interactive)
   (goto-char (point-min))
   (while (re-search-forward "\\([0-9\\. \\-]*\\)\\( [0-9]* *\\)$" nil t)
     (replace-match " \\2")))
