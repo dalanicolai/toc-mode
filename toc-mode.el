@@ -325,16 +325,17 @@ The newly created PDF that includes the TOC is written to a file
 named output.pdf and opened in a new buffer. Don't forget to
 rename this new file."
   (interactive)
-  (write-file default-directory)
-  (let* ((message (shell-command-to-string (format "pdftocio '%s' < toc" pdf-filename))))
+  (let* ((output-buf (get-buffer-create "*pdftocio-output*")))
+    (call-process-region (point-min) (point-max) "pdftocio"
+                         nil output-buf nil pdf-filename)
     (kill-buffer-if-not-modified (find-file pdf-filename))
     (when (file-exists-p (concat (file-name-base pdf-filename) "_out.pdf"))
       (delete-file pdf-filename)
       (rename-file (concat (file-name-base pdf-filename) "_out.pdf") pdf-filename))
     (find-file pdf-filename)
-    (unless (string= message "")
-      (message (concat "The pdftocio command returned the following message: \n\n" message)))))
-
+    (if (> (buffer-size output-buf) 0)
+        (pop-to-buffer output-buf)
+      (kill-buffer output-buf))))
 
 (defvar toc-pdftocgen-mode-map
   (let ((map (make-sparse-keymap)))
