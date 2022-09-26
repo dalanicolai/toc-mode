@@ -1,5 +1,6 @@
 ;;; toc-mode.el --- Manage outlines/table of contents of pdf and djvu documents  -*- lexical-binding: t; -*-
-;; Copyright (C) 2020  Daniel Laurens Nicolai
+
+;; Copyright (C) 2022  Free Software Foundation, Inc.
 
 ;; Author: Daniel Laurens Nicolai <dalanicolai@gmail.com>
 ;; Version: 0
@@ -235,13 +236,11 @@
 (defcustom toc-replace-original-file t
   "For PDF include TOC and replace old PDF file.
 For DJVU the old DJVU file is replaced by default"
-  :type 'boolean
-  :group 'toc)
+  :type 'boolean)
 
 (defcustom toc-destination-file-name "pdfwithtoc.pdf"
   "Filename for new PDF if `toc-replace-original-file' is nil."
-  :type 'file
-  :group 'toc)
+  :type 'file)
 
 (defcustom toc-ocr-languages nil
   "Languages used for extraction with ocr.
@@ -249,21 +248,18 @@ Should be one or multiple language codes as recognized
 by tesseract -l flag, e.g. eng or eng+nld. Use
 \\[execute-extended-command] `toc-list-languages' to list the
 available languages."
-  :type 'string
-  :group 'toc)
+  :type 'string)
 
 (defcustom toc-handyoutliner-path nil
   "Path to handyoutliner executable.
 String (i.e. surround with double quotes). See
 URL`http://handyoutlinerfo.sourceforge.net/'."
-  :type 'file
-  :group 'toc)
+  :type 'file)
 
 (defcustom toc-file-browser-command nil
   "Command to open file browser.
 String (i.e. surround with double quotes)."
-  :type 'file
-  :group 'toc)
+  :type 'file)
 
 ;;;; pdf.tocgen
 ;;;###autoload
@@ -560,7 +556,7 @@ unprocessed text."
               ;;                 nil
               ;;                 (number-to-string page)
               ;;                 (image-property djvu-doc-image :data))))))
-              (apply 'call-process
+              (apply #'call-process
                      (append (list "tesseract" nil (list buffer nil) nil file)
                              args))
               (setq page (1+ page))))
@@ -620,26 +616,28 @@ Prompt for startpage and endpage and print OCR output to new buffer."
                                                nil
                                                (number-to-string page)
                                                (image-property djvu-doc-image :data))))))
-              (apply 'call-process
+              (apply #'call-process
                      (append (list "tesseract" nil (list buffer nil) nil file)
                              args))
               (setq page (1+ page))))
           (switch-to-buffer buffer)))))
 
 (defun toc--create-tablist-buffer ()
-  "Create tablist buffer, from cleaned up Table of Contents buffer, for easy page number adjustment."
+  "Create tablist buffer, from cleaned up Table of Contents buffer.
+The tablist buffer provides features for easy page number
+adjustment."
   (interactive)
   (toc--list doc-buffer))
 
 ;;;; toc major modes
 
 (when (require 'pdf-tools nil t)
-  (define-key pdf-view-mode-map (kbd "C-c C-e") 'toc-extract-pages)
-  (define-key pdf-view-mode-map (kbd "C-c e") 'toc-extract-pages-ocr))
+  (define-key pdf-view-mode-map (kbd "C-c C-e") #'toc-extract-pages)
+  (define-key pdf-view-mode-map (kbd "C-c e") #'toc-extract-pages-ocr))
 
 (when (require 'djvu nil t)
-  (define-key djvu-read-mode-map (kbd "C-c C-e") 'toc-extract-pages)
-  (define-key djvu-read-mode-map (kbd "C-c e") 'toc-extract-pages-ocr))
+  (define-key djvu-read-mode-map (kbd "C-c C-e") #'toc-extract-pages)
+  (define-key djvu-read-mode-map (kbd "C-c e") #'toc-extract-pages-ocr))
 
 (defvar toc-cleanup-mode-map
   (let ((map (make-sparse-keymap)))
