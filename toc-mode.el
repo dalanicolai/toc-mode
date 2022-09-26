@@ -24,16 +24,16 @@
 
 ;;; Commentary:
 
-;; toc-mode.el is a package to create and add a Table of Contents to pdf and
-;; djvu documents. It implements features to extract a Table of Contents from
-;; the textlayer of a document or via OCR if that last option is necessary or
-;; prefered. For 'software generated' PDFs it provides the option to use
-;; pdf.tocgen (see URL `https://krasjet.com/voice/pdf.tocgen/'). Subsequently
-;; this package implements various features to assist in tidy up the extracted
-;; Table of Contents, adjust the pagenumbers and finally parsing the Table of
-;; Contents into syntax that is understood by the `pdfoutline' and `djvused'
-;; commands that are used to add the table of contents to pdf- and djvu-files
-;; respectively.
+;; toc-mode.el is a package for creating and adding Tables of Contents to pdf
+;; and djvu documents. It includes features for extracting the Table of Contents
+;; from the textlayer of a document or via OCR if that last option is necessary
+;; (or prefered). For 'software generated' PDFs it provides the option to use
+;; pdf.tocgen (see URL `https://krasjet.com/voice/pdf.tocgen/'). Additionally,
+;; this package implements various features for assisting in tidying up the
+;; extracted Table of Contents, adjusting the pagenumbers and finally parsing
+;; the Table of Contents into syntax that is understood by the `pdfoutline' and
+;; `djvused' commands that are used to add the table of contents to pdf- and
+;; djvu-files respectively.
 
 ;; Requirements: To use the pdf.tocgen functionality that software has to be
 ;; installed (see URL `https://krasjet.com/voice/pdf.tocgen/'). For the
@@ -58,7 +58,7 @@
 ;; 3 adjust/correct pagenumbers
 ;; 4 add TOC to document
 
-;; 1. Extraction For PDFs without TOC pages, with a very complicated TOC (i.e.
+;; 1. Extraction: For PDFs without TOC pages, with a very complicated TOC (i.e.
 ;; that require much cleanup work) or with headlines well fitted for automatic
 ;; extraction (you will have to decide for yourself by trying it) consider to
 ;; use the pdf.tocgen (URL `https://krasjet.com/voice/pdf.tocgen/')
@@ -106,7 +106,7 @@
 ;; If you merely want to extract text without further processing then you can
 ;; use the command `toc-extract-only'.
 
-;; 2. TOC-Cleanup In this mode you can further cleanup the contents to create a
+;; 2. TOC-Cleanup: In this mode you can further cleanup the contents to create a
 ;; list where each line has the structure:
 
 ;; TITLE (SOME) PAGENUMBER
@@ -144,7 +144,7 @@
 
 ;; Type C-c C-c when finished
 
-;; 3. TOC-tabular (adjust pagenumbers) This mode provides the functionality for
+;; 3. TOC-tabular (adjust pagenumbers): This mode provides the functionality for
 ;; easy adjustment of pagenmumbers. The buffer can be navigated with the arrow
 ;; up/down keys. The left and right arrow keys will shift down/up all the page
 ;; numbers from the current line and below (combine with SHIFT for setting
@@ -158,10 +158,10 @@
 
 ;; Type C-c C-c when done.
 
-;; 4. TOC-mode (add outline to document) The text of this buffer should have the
-;; right structure for adding the contents to (for pdf’s a copy of) the original
-;; document. Final adjusments can be done but should not be necessary. Type C-c
-;; C-c for adding the contents to the document.
+;; 4. TOC-mode (add outline to document): The text of this buffer should have
+;; the right structure for adding the contents to (for pdf’s a copy of) the
+;; original document. Final adjusments can be done but should not be necessary.
+;; Type C-c C-c for adding the contents to the document.
 
 ;; By default, the TOC is simply added to the original file. ONLY FOR PDF’s, if
 ;; the (customizable) variable toc-replace-original-file is nil, then the TOC is
@@ -184,9 +184,10 @@
 ;; Finally, if you just want to extract some text
 
 ;; Keybindings
+;; Key Binding        Description
+
 ;; all-modes (i.e. all steps)
-;;  Key Binding       Description
-;;  C-c C-c           dispatch (next step)
+;; C-c C-c            dispatch (next step)
 
 ;; toc-cleanup-mode
 ;; C-c C-j            toc--join-next-unnumbered-lines
@@ -269,10 +270,10 @@ In a pdf-view buffer select a single word in the headline of a
 certain level. Then run `toc-gen-set-level' to write the text
 properties to the recipe.toml file that is created in the
 document's directory. You will be prompted to enter the LEVEL
-number. The highest level should have number 1, the next leve
+number. The highest level should have number 1, the next level
 number 2 etc."
   (interactive "nWhich level you are setting (number): ")
-  (let* ((page (eval (pdf-view-current-page)))
+  (let* ((page (pdf-view-current-page))
          (filename (url-filename (url-generic-parse-url buffer-file-name)))
          (pdfxmeta-result (shell-command
                            (format "pdfxmeta --auto %s --page %s '%s' \"%s\" >> recipe.toml"
@@ -369,7 +370,8 @@ Like `toc--cleanup-dots' but more suited for use after OCR"
   (flush-lines "contents"))
 
 (defun toc--cleanup-lines-roman-string ()
-  "Delete all lines that contain only linefeeds and/or blanks and/or roman numerals."
+  "Delete all lines that contain only linefeeds and/or blanks
+ and/or roman numerals."
   (interactive)
   (goto-char (point-min))
   (while (not (eobp))
@@ -384,7 +386,7 @@ Like `toc--cleanup-dots' but more suited for use after OCR"
   (flush-lines "^ *$"))
 
 (defun toc--roman-to-arabic (arg)
-  "Transform roman pagenumbers to hindu-arabic numberals.
+  "Transform roman pagenumbers to Hindu-Arabic numerals.
 This function only works for lines that end with roman numerals.
 Prefix with numeric ARG prefix to apply to the next ARG lines."
   (interactive "p")
@@ -399,7 +401,8 @@ Prefix with numeric ARG prefix to apply to the next ARG lines."
       (forward-line))))
 
 (defun toc--join-next-unnumbered-lines ()
-  "Search from point for first occurence of line not ending with Western numerals."
+  "Search from point for first occurence of line not ending with
+Western Arabic numerals."
   (interactive)
   (re-search-forward "[^0-9]\\s-*$" nil t)
   (join-line 1))
@@ -410,13 +413,17 @@ Prefix with numeric ARG prefix to apply to the next ARG lines."
   (re-search-forward "^[0-9\\.]*\\. " nil t))
 
 (defun toc--cleanup (contents-page &optional arg)
-  "Cleanup extracted Table Of Contents by running a series of cleanup functions.
+  "Cleanup extracted Table Of Contents by running a series of
+ cleanup functions.
+
 It executes the following steps:
+
 1. insert a Contents entry with pagenumber CONTENTS-PAGE
-2. delete subsequent lines containing the string 'contents'
+2. delete subsequent lines containing the string \"contents\"
 3. tries to delete redundant dots
 4. deletes lines that containi only roman numerals and linefeed characters
 5. deletes
+
 When ARG is non-nil it skips the last three steps"
   (interactive)
   (goto-char (point-min))
@@ -504,7 +511,7 @@ text."
       (message "Buffer not in pdf-view- or djvu-read-mode"))))
 
 (defun toc-list-languages ()
-  "List languages available for ocr.
+  "List languages available for OCR.
 For use in `toc-ocr-languages'."
   (interactive)
   (let ((print-length nil))
@@ -743,13 +750,15 @@ adjustment."
     (other-window 1)))
 
 (defun toc--increase-remaining-and-follow ()
-  "Increase pagenumber of current entry and all entries below and preview page in separate document buffer."
+  "Increase pagenumber of current entry and all entries below.
+Additionally preview page in separate document buffer."
   (interactive)
   (toc--increase-remaining)
   (toc--tablist-follow))
 
 (defun toc--decrease-remaining-and-follow ()
-  "Decrease pagenumber of current entry and all entries below and preview page in separate document buffer."
+  "Decrease pagenumber of current entry and all entries below.
+Additionally preview page in separate document buffer."
   (interactive)
   (toc--decrease-remaining)
   (toc--tablist-follow))
@@ -807,7 +816,7 @@ adjustment."
     (define-key map [S-left] #'toc--decrease)
     (define-key map [C-right] #'toc--increase-remaining-and-follow)
     (define-key map [C-left] #'toc--decrease-remaining-and-follow)
-    (define-key map "\C-r" #'toc--replace-input)
+    (define-key map "r" #'toc--replace-input)
     (define-key map [tab] #'toc--tablist-follow)
     (define-key map [S-down] #'toc--scroll-other-window-page-up)
     (define-key map [S-up] #'toc--scroll-other-window-page-down)
@@ -857,7 +866,7 @@ adjustment."
 ;;; pdf parse tablist to
 (defun toc--tablist-to-pdfoutline ()
   "Parse and prepare tablist-mode-buffer to source input.
-Displays results in a newlycreated buffer for use as source input
+Displays results in a newly created buffer for use as source input
 to `pdfoutline' shell command."
   (interactive)
   (goto-char (point-min))
@@ -974,7 +983,8 @@ to `pdfoutline' shell command."
 
 ;;;; add outline to document
 (defun toc--add-to-pdf ()
-  "Use buffer contents as source for adding TOC to PDF using the shell program `pdfoutline'."
+  "Use buffer contents as source for adding TOC to PDF.
+This command uses the shell program `pdfoutline'."
   (interactive)
   (save-buffer)
   (call-process "pdfoutline" nil "*pdfoutline*" nil
@@ -985,7 +995,8 @@ to `pdfoutline' shell command."
                   toc-destination-file-name)))
 
 (defun toc--add-to-djvu ()
-  "Use buffer contents as source for adding TOC to DJVU using the shell program `djvused'."
+  "Use buffer contents as source for adding TOC to DJVU.
+This command uses the shell program `djvused'."
   (interactive)
   (write-file default-directory)
   (print (format
