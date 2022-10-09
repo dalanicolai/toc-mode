@@ -3,6 +3,16 @@
 [[https://www.gnu.org/licenses/gpl-3.0.en.html][https://img.shields.io/badge/license-GPLv3-blue.svg]]
 
 Create, cleanup, add and manage Table Of Contents (TOC) of pdf and djvu documents with Emacs
+
+* DEPRECATED
+For publishing this package to ELPA, and in order to fit better in the Emacs
+'ecosystem', it was decided to make this package an 'extension' of the future
+[[https://github.com/dalanicolai/doc-tools][doc-tools]] package. Hence, this repo has been forked and renamed to
+[[https://github.com/dalanicolai/doc-tools-toc][doc-tools-toc]], where also the package has been renamed to the less fancy name
+=doc-toc=. The current repo is only kept temporarily to not suddenly break the
+configuration of current users. New users are strongly advised to install the
+[[https://elpa.gnu.org/packages/doc-toc.html][doc-toc package from ELPA]].
+
 * Introduction
 TOC-mode is a package for creating, cleaning, adding and managing the
 Table Of Contents (TOC) of pdf and djvu documents.
